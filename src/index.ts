@@ -1,7 +1,9 @@
 import app from "./app";
 import "dotenv/config";
 
-const portFromEnv = process.env.PORT ? Number.parseInt(process.env.PORT, 10) : NaN;
+const portFromEnv = process.env.PORT
+	? Number.parseInt(process.env.PORT, 10)
+	: NaN;
 const PORT = Number.isFinite(portFromEnv) ? portFromEnv : 3000;
 
 app.listen(PORT, () => {
