@@ -25,25 +25,40 @@ const level = () => {
 	return env === "development" ? "debug" : "warn";
 };
 
-const format = winston.format.combine(
-	winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss:ms" }),
-	winston.format.colorize({ all: true }),
+const fileFormat = winston.format.combine(
+	winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" }),
 	winston.format.printf(
 		(info) => `${info.timestamp} ${info.level}: ${info.message}`,
 	),
 );
 
-const LOG_DIR = path.resolve(process.cwd(), "logs");
-mkdirSync(LOG_DIR, { recursive: true });
+const consoleFormat = winston.format.combine(
+	winston.format.colorize({ all: true }),
+	fileFormat,
+);
+const format = fileFormat;
 
-const transports = [
-	new winston.transports.Console(),
-	new winston.transports.File({
-		filename: path.join(LOG_DIR, "error.log"),
-		level: "error",
-	}),
-	new winston.transports.File({ filename: path.join(LOG_DIR, "all.log") }),
+const transports: winston.transport[] = [
+	new winston.transports.Console({ format: consoleFormat }),
 ];
+
+try {
+	const LOG_DIR = path.resolve(process.cwd(), "logs");
+	mkdirSync(LOG_DIR, { recursive: true });
+	transports.push(
+		new winston.transports.File({
+			filename: path.join(LOG_DIR, "error.log"),
+			level: "error",
+			format: fileFormat,
+		}),
+		new winston.transports.File({
+			filename: path.join(LOG_DIR, "all.log"),
+			format: fileFormat,
+		}),
+	);
+} catch {
+	// Fall back to console-only logging when the filesystem is not writable.
+}
 
 const Logger = winston.createLogger({
 	level: level(),
