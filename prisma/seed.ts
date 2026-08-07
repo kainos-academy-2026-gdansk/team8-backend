@@ -2,7 +2,11 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL ?? "" });
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+throw new Error("DATABASE_URL is required to run the seed script.");
+}
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 const capabilityNames = [
@@ -48,7 +52,9 @@ async function main() {
 	const bands = await prisma.band.findMany();
 
 	if (capabilities.length < 10 || bands.length < 10) {
-		throw new Error("Expected at least 10 capabilities and 10 bands after seed insert.");
+		throw new Error(
+			"Expected at least 10 capabilities and 10 bands after seed insert.",
+		);
 	}
 
 	const now = new Date();
