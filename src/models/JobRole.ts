@@ -1,5 +1,5 @@
-import { Capability } from './Capability';
-import { Band } from './Band';
+import { Capability } from './capability';
+import { Band } from './band';
 
 export class JobRole {
     constructor(

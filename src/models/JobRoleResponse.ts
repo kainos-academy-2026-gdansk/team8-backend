@@ -1,7 +1,7 @@
-import { Capability } from './Capability';
-import { Band } from './Band';
+import { Capability } from './capability';
+import { Band } from './band';
 
-export class JobRole {
+export class JobRoleResponse {
     constructor(
         public readonly id: number,
         public readonly roleName: string,

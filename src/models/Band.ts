@@ -1,4 +1,4 @@
-import { JobRole } from "./JobRole";
+import { JobRole } from "./jobRole";
 
 export class Band {
     constructor(
