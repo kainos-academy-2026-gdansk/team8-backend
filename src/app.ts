@@ -1,11 +1,13 @@
 import express from "express";
 import morganMiddleware from "./config/morganMiddleware";
 import Logger from "./lib/logger";
+import jobRoleRouter from "./routes/jobRoleRouter";
 
 export const app = express();
 
 app.use(express.json());
 app.use(morganMiddleware);
+app.use("/jobs", jobRoleRouter);
 
 app.get("/", (_req, res) => {
 	Logger.info("Root endpoint accessed");

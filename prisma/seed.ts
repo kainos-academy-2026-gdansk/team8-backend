@@ -1,0 +1,105 @@
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client";
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+throw new Error("DATABASE_URL is required to run the seed script.");
+}
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
+
+const capabilityNames = [
+	"Software Engineering",
+	"Cloud",
+	"DevOps",
+	"Platform Engineering",
+	"Quality Engineering",
+	"Data & Analytics",
+	"Artificial Intelligence & Machine Learning",
+	"Experience Design",
+	"Product Management",
+	"Business Analysis",
+	"Cyber Security",
+	"Workday",
+	"Solution Architecture",
+];
+
+const bandNames = [
+	"Trainee",
+	"Associate",
+	"Senior Associate",
+	"Consultant",
+	"Senior Consultant",
+	"Principal",
+	"Manager",
+	"Senior Manager",
+	"Capability Lead",
+	"Director",
+];
+
+async function main() {
+	await prisma.jobRole.deleteMany();
+	await prisma.capability.deleteMany();
+	await prisma.band.deleteMany();
+
+	await prisma.capability.createMany({
+		data: capabilityNames.map((name) => ({ name })),
+	});
+
+	await prisma.band.createMany({
+		data: bandNames.map((name) => ({ name })),
+	});
+
+	const capabilities = await prisma.capability.findMany();
+	const bands = await prisma.band.findMany();
+
+	if (capabilities.length < 10 || bands.length < 10) {
+		throw new Error(
+			"Expected at least 10 capabilities and 10 bands after seed insert.",
+		);
+	}
+
+	const now = new Date();
+
+	await prisma.jobRole.createMany({
+		data: Array.from({ length: 10 }, (_, index) => ({
+			roleName: `Engineer ${index + 1}`,
+			location:
+				index % 4 === 0
+					? "Gdansk"
+					: index % 4 === 1
+						? "Warsaw"
+						: index % 4 === 2
+							? "Krakow"
+							: "Remote",
+			capabilityId: capabilities[index % capabilities.length].id,
+			bandId: bands[index % bands.length].id,
+			closingDate: new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate() + index + 7,
+			),
+			status: index % 2 === 0 ? "OPEN" : "CLOSED",
+		})),
+	});
+
+	const [capabilityCount, bandCount, jobRoleCount] = await Promise.all([
+		prisma.capability.count(),
+		prisma.band.count(),
+		prisma.jobRole.count(),
+	]);
+
+	console.log(
+		`Seed complete: ${capabilityCount} capabilities, ${bandCount} bands, ${jobRoleCount} job roles.`,
+	);
+}
+
+main()
+	.catch((error) => {
+		console.error("Seed failed:", error);
+		process.exit(1);
+	})
+	.finally(async () => {
+		await prisma.$disconnect();
+	});
