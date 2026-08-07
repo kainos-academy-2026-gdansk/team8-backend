@@ -10,29 +10,32 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 const capabilityNames = [
-	"Java",
-	"TypeScript",
-	"Python",
-	"Go",
-	"SQL",
-	"AWS",
-	"Azure",
-	"Docker",
-	"Kubernetes",
-	"React",
+	"Software Engineering",
+	"Cloud",
+	"DevOps",
+	"Platform Engineering",
+	"Quality Engineering",
+	"Data & Analytics",
+	"Artificial Intelligence & Machine Learning",
+	"Experience Design",
+	"Product Management",
+	"Business Analysis",
+	"Cyber Security",
+	"Workday",
+	"Solution Architecture",
 ];
 
 const bandNames = [
+	"Trainee",
 	"Associate",
+	"Senior Associate",
 	"Consultant",
 	"Senior Consultant",
-	"Lead Consultant",
 	"Principal",
-	"Architect",
 	"Manager",
 	"Senior Manager",
+	"Capability Lead",
 	"Director",
-	"Partner",
 ];
 
 async function main() {
