@@ -7,6 +7,7 @@ Team8 Backend API service.
 - Node.js (LTS recommended)
 - npm
 - PostgreSQL database
+- Docker
 
 ## Setup
 
@@ -19,8 +20,8 @@ npm install
 2. Create a `.env` file in this folder:
 
 ```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME"
 PORT=3000
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME"
 ```
 
 ## Start PostgreSQL With Docker
@@ -31,20 +32,13 @@ PORT=3000
 docker run --name KNS-JOBS-db -e POSTGRES_PASSWORD=password -e POSTGRES_DB=KNS_JOBS -p 5432:5432 -d postgres
 ```
 
-2. Update `.env` to use the Docker database:
-
-```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/KNS_JOBS"
-PORT=3000
-```
-
-3. Verify the container is running:
+2. Verify the container is running:
 
 ```bash
 docker ps
 ```
 
-4. If you stop your machine or container, start it again with:
+3. If you stop your machine or container, start it again with:
 
 ```bash
 docker start KNS-JOBS-db
