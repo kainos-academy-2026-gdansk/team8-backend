@@ -7,3 +7,27 @@ datasource db {
   provider = "postgresql"
 }
 
+model JobRole {
+  id Int @id @default(autoincrement())
+  roleName String
+  location String
+  capablity Capability @relation(fields: [capabilityId], references: [id])
+  capabilityId Int
+  band Band @relation(fields: [bandId], references: [id])
+  bandId Int 
+  closingDate DateTime
+  status String
+}
+
+model Capability {
+  id Int @id @default(autoincrement())
+  name String
+  jobRoles JobRole[]
+}
+
+model Band {
+   id Int @id @default(autoincrement())
+   name String
+   jobRoles JobRole[]
+}
+
