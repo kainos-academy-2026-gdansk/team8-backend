@@ -32,7 +32,7 @@
 	},
 	"homepage": "https://github.com/kainos-academy-2026-gdansk/team8-backend#readme",
 	"devDependencies": {
-		"@biomejs/biome": "^2.5.7",
+		"@biomejs/biome": "2.5.7",
 		"@types/express": "^5.0.6",
 		"@types/node": "^26.1.2",
 		"@types/pg": "^8.20.4",
