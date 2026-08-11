@@ -15,7 +15,6 @@ export class JobRole {
 		public readonly band: Band,
 		public readonly bandId: number,
 		public readonly closingDate: Date,
-		// public readonly status: "OPEN" | "CLOSED",
 		public readonly status: Status,
 		public readonly statusId: number,
 		public readonly numberOfOpenPositions: number,
@@ -50,8 +49,5 @@ export class JobRole {
 		if (!Number.isInteger(statusId) || statusId < 0) {
 			throw new Error("JobRole statusId must be a non-negative integer");
 		}
-		// if (status !== "OPEN" && status !== "CLOSED") {
-		// 	throw new Error("JobRole status must be either 'OPEN' or 'CLOSED'");
-		// }
 	}
 }

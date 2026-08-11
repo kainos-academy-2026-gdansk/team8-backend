@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import Logger from "../lib/logger";
 import type { JobRoleService } from "../services/jobRoleService";
-import { error } from "node:console";
 
 export class JobRoleController {
 	constructor(private readonly jobRoleService: JobRoleService) {}
@@ -20,12 +19,12 @@ export class JobRoleController {
 		try {
 			const id = Number(_req.params.id);
 
-			if (id < 0 || isNaN(id)) {
+			if (!Number.isInteger(id) || id <= 0) {
 				res.status(400).json({ error: "Id should be a positive number" });
 				return;
 			}
 
-			const jobRole = await this.jobRoleService.getById(Number(_req.params.id));
+			const jobRole = await this.jobRoleService.getById(id);
 
 			if (!jobRole) {
 				res.status(404).json({ error: "Job role not found" });
