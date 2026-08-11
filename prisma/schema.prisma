@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -16,7 +16,12 @@ model JobRole {
   band Band @relation(fields: [bandId], references: [id])
   bandId Int
   closingDate DateTime
-  status String
+  status JobRoleStatus
+}
+
+enum JobRoleStatus {
+  OPEN
+  CLOSED
 }
 
 model Capability {
@@ -30,4 +35,3 @@ model Band {
    name String
    jobRoles JobRole[]
 }
-

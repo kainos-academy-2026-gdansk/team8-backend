@@ -1,10 +1,10 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "../src/generated/prisma/client";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-throw new Error("DATABASE_URL is required to run the seed script.");
+	throw new Error("DATABASE_URL is required to run the seed script.");
 }
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
@@ -38,6 +38,40 @@ const bandNames = [
 	"Director",
 ];
 
+const locations = [
+	"Belfast",
+	"London",
+	"Birmingham",
+	"Derry/Londonderry",
+	"Gdansk",
+	"Dublin",
+	"Amsterdam",
+	"Copenhagen",
+	"Toronto",
+	"Indianapolis",
+	"Remote",
+];
+
+const jobRoleSeeds = [
+	{ roleName: "Software Engineer", capability: "Software Engineering" },
+	{ roleName: "Senior Software Engineer", capability: "Software Engineering" },
+	{ roleName: "Cloud Engineer", capability: "Cloud" },
+	{ roleName: "DevOps Engineer", capability: "DevOps" },
+	{ roleName: "Platform Engineer", capability: "Platform Engineering" },
+	{ roleName: "Test Engineer", capability: "Quality Engineering" },
+	{ roleName: "Data Engineer", capability: "Data & Analytics" },
+	{
+		roleName: "Machine Learning Engineer",
+		capability: "Artificial Intelligence & Machine Learning",
+	},
+	{ roleName: "Experience Designer", capability: "Experience Design" },
+	{ roleName: "Product Manager", capability: "Product Management" },
+	{ roleName: "Business Analyst", capability: "Business Analysis" },
+	{ roleName: "Cyber Security Consultant", capability: "Cyber Security" },
+	{ roleName: "Workday Consultant", capability: "Workday" },
+	{ roleName: "Solution Architect", capability: "Solution Architecture" },
+];
+
 async function main() {
 	await prisma.jobRole.deleteMany();
 	await prisma.capability.deleteMany();
@@ -60,28 +94,28 @@ async function main() {
 		);
 	}
 
+	const capabilityByName = new Map(capabilities.map((c) => [c.name, c]));
 	const now = new Date();
 
 	await prisma.jobRole.createMany({
-		data: Array.from({ length: 10 }, (_, index) => ({
-			roleName: `Engineer ${index + 1}`,
-			location:
-				index % 4 === 0
-					? "Gdansk"
-					: index % 4 === 1
-						? "Warsaw"
-						: index % 4 === 2
-							? "Krakow"
-							: "Remote",
-			capabilityId: capabilities[index % capabilities.length].id,
-			bandId: bands[index % bands.length].id,
-			closingDate: new Date(
-				now.getFullYear(),
-				now.getMonth(),
-				now.getDate() + index + 7,
-			),
-			status: index % 2 === 0 ? "OPEN" : "CLOSED",
-		})),
+		data: jobRoleSeeds.map((role, index) => {
+			const capability = capabilityByName.get(role.capability);
+			if (!capability) {
+				throw new Error(`Missing capability for role: ${role.roleName}`);
+			}
+			return {
+				roleName: role.roleName,
+				location: locations[index % locations.length],
+				capabilityId: capability.id,
+				bandId: bands[index % bands.length].id,
+				closingDate: new Date(
+					now.getFullYear(),
+					now.getMonth(),
+					now.getDate() + index + 7,
+				),
+				status: index % 2 === 0 ? "OPEN" : "CLOSED",
+			};
+		}),
 	});
 
 	const [capabilityCount, bandCount, jobRoleCount] = await Promise.all([

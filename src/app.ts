@@ -7,7 +7,7 @@ export const app = express();
 
 app.use(express.json());
 app.use(morganMiddleware);
-app.use("/jobs", jobRoleRouter);
+app.use("/job-roles", jobRoleRouter);
 
 app.get("/", (_req, res) => {
 	Logger.info("Root endpoint accessed");
