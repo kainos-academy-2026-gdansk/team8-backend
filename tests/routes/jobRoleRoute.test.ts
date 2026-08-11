@@ -17,7 +17,7 @@ vi.mock("../../src/services/jobRoleService", () => {
 
 import app from "../../src/app";
 
-describe("GET /job-roles", () => {
+describe("GET /api/job-roles", () => {
 	beforeEach(() => {
 		getAllMock.mockReset();
 	});
@@ -37,7 +37,7 @@ describe("GET /job-roles", () => {
 
 		getAllMock.mockResolvedValueOnce(mockedResponse);
 
-		const response = await request(app).get("/job-roles");
+		const response = await request(app).get("/api/job-roles");
 
 		expect(response.status).toBe(200);
 		expect(response.body).toEqual(mockedResponse);
@@ -47,7 +47,7 @@ describe("GET /job-roles", () => {
 	it("returns status 500 when service fails", async () => {
 		getAllMock.mockRejectedValueOnce(new Error("Database unavailable"));
 
-		const response = await request(app).get("/job-roles");
+		const response = await request(app).get("/api/job-roles");
 
 		expect(response.status).toBe(500);
 		expect(response.body).toEqual({ error: "Failed to fetch job roles" });
