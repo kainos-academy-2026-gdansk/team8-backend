@@ -1,6 +1,6 @@
 import type { JobRoleDao } from "../dao/jobRoleDao";
 import { mapJobRoleToJobRoleResponses } from "../mappers/jobRoleMapper";
-import type { JobRoleResponse } from "../models/JobRoleResponse";
+import type { JobRoleResponse } from "../dtos/JobRoleDto";
 
 export class JobRoleService {
 	constructor(private dao: JobRoleDao) {}
