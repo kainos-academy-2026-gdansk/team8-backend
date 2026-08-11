@@ -18,6 +18,7 @@
 		"start": "node ./dist/index.js",
 		"lint": "biome lint .",
 		"lint:fix": "biome lint --write .",
+		"lint:format": "biome format --write .",
 		"test": "vitest run",
 		"test:coverage": "vitest run --coverage"
 	},
