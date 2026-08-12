@@ -1,6 +1,6 @@
-import type { RegisterRequestDto, RegisterResponseDto } from "../dtos/UserDto";
+import type { RegisterResponseDto } from "../dtos/UserDto";
 
 export interface UserDao {
     emailExists(email: string): Promise<boolean>;
-    register(input: RegisterRequestDto): Promise<RegisterResponseDto>;
+    register(email: string, password: string): Promise<RegisterResponseDto>;
 }

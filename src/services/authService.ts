@@ -11,7 +11,7 @@ export class AuthService {
         }
 
         const hashedPassword = await argon2.hash(input.password);
-        const user = await this.userDao.register({ ...input, password: hashedPassword });
+        const user = await this.userDao.register(input.email, hashedPassword);
         return user;
     }
 }

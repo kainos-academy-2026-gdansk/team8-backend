@@ -60,11 +60,10 @@ describe("AuthService", () => {
 
 		expect(dao.emailExists).toHaveBeenCalledWith("john.doe@example.com");
 		expect(argon2.hash).toHaveBeenCalledWith("StrongPass!1");
-		expect(dao.register).toHaveBeenCalledWith({
-			email: "john.doe@example.com",
-			password: "hashed-password",
-			confirmPassword: "StrongPass!1",
-		});
+		expect(dao.register).toHaveBeenCalledWith(
+			"john.doe@example.com",
+			"hashed-password",
+		);
 		expect(result).toEqual(user);
 	});
 
