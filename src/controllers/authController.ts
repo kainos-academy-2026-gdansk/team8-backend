@@ -15,7 +15,7 @@ export class AuthController {
         return;
       }
       const user = await this.authService.register(parsed.data);
-      Logger.debug(`User registered successfully: ${`email:${user.email}` + `, role:${user.role}`}`);
+      Logger.debug(`User registered successfully:`);
       res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
