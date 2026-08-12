@@ -15,9 +15,9 @@ export class JobRoleController {
 		}
 	}
 
-	async getById(_req: Request, res: Response): Promise<void> {
+	async getById(req: Request, res: Response): Promise<void> {
 		try {
-			const id = Number(_req.params.id);
+			const id = Number(req.params.id);
 
 			if (!Number.isInteger(id) || id <= 0) {
 				res.status(400).json({ error: "Id should be a positive number" });

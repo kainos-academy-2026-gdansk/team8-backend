@@ -20,7 +20,7 @@ export class JobRole {
 		public readonly numberOfOpenPositions: number,
 	) {
 		if (!Number.isInteger(id) || id < 0) {
-			throw new Error("JobRole id must be a non-negative integer");
+			throw new Error("JobRole id must be a positive integer");
 		}
 		if (roleName.trim().length === 0) {
 			throw new Error("JobRole roleName is required");
@@ -38,16 +38,19 @@ export class JobRole {
 			throw new Error("JobRole location is required");
 		}
 		if (!Number.isInteger(capabilityId) || capabilityId < 0) {
-			throw new Error("JobRole capabilityId must be a non-negative integer");
+			throw new Error("JobRole capabilityId must be a positive integer");
 		}
 		if (!Number.isInteger(bandId) || bandId < 0) {
-			throw new Error("JobRole bandId must be a non-negative integer");
+			throw new Error("JobRole bandId must be a positive integer");
 		}
 		if (Number.isNaN(closingDate.getTime())) {
 			throw new Error("JobRole closingDate must be a valid date");
 		}
 		if (!Number.isInteger(statusId) || statusId < 0) {
-			throw new Error("JobRole statusId must be a non-negative integer");
+			throw new Error("JobRole statusId must be a positive integer");
+		}
+		if (!Number.isInteger(numberOfOpenPositions) || numberOfOpenPositions <= 0) {
+			throw new Error("JobRole numberOfOpenPositions must be a positive integer");
 		}
 	}
 }
