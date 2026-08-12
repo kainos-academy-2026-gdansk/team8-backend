@@ -12,6 +12,11 @@ Execute approved plans end-to-end through implementation, validation, review, an
 ## Trigger
 Use this agent when the requested phase includes writing/implementation.
 
+## Required Inputs
+- Path to a prepared .ai story session directory
+- story.md with user story details
+- plan.md with approved implementation plan
+
 ## Required Flow
 1. Implement
 2. Validate
@@ -22,10 +27,16 @@ Use this agent when the requested phase includes writing/implementation.
    - If declined: return to plan, then loop back to implement
 
 ## Behavior
+### Preflight
+- Read story.md and plan.md from the provided .ai session directory.
+- If either file is missing, stop and ask to run read-workflow first.
+- If plan approval is missing or unclear, stop and request explicit approval.
+
 ### Implement
 - Apply minimal scoped changes.
 - Keep repository layering and conventions.
 - Do not introduce new inventions without explicit approval.
+- Implement only scope approved in plan.md.
 
 ### Validate
 - Run targeted tests first for changed areas.
@@ -54,3 +65,4 @@ Provide a concise checklist with:
 - If plan is not approved, do not implement.
 - If requirements are unclear, ask before coding.
 - If validation fails, fix or report blockers clearly.
+- Use story.md and plan.md as source of truth for implementation scope.
