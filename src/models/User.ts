@@ -14,21 +14,5 @@ export class User {
         if (passwordHash.trim().length === 0) {
             throw new Error("User password is required");
         }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            throw new Error("Invalid email format");
-        }
-        const hasUppercase = /[A-Z]/.test(passwordHash);
-        const hasLowercase = /[a-z]/.test(passwordHash);
-        const hasSpecialCharacter = /[^A-Za-z0-9]/.test(passwordHash);
-        if (
-            passwordHash.length <= 8 ||
-            !hasUppercase ||
-            !hasLowercase ||
-            !hasSpecialCharacter
-        ) {
-            throw new Error(
-                "User password must be longer than 8 characters and include uppercase, lowercase, and special characters",
-            );
-        }
     }
 }

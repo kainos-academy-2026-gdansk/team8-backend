@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { RegisterRequestDto } from "../dtos/UserDto";
+import { RegisterSchema } from "../dtos/UserDto";
 import Logger from "../lib/logger";
 import type { AuthService } from "../services/authService";
 
@@ -9,7 +9,12 @@ export class AuthController {
 
   async register(req: Request, res: Response): Promise<void> {
     try {
-      const user = await this.authService.register(req.body as RegisterRequestDto);
+      const parsed = RegisterSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ error: "Invalid request body" });
+        return;
+      }
+      const user = await this.authService.register(parsed.data);
       Logger.debug(`User registered successfully: ${JSON.stringify(user)}`);
       res.status(201).json(user);
     } catch (error) {

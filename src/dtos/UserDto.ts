@@ -16,4 +16,9 @@ export const RegisterSchema = z
         path: ["confirmPassword"],
     });
 
+export type RegisterResponseDto = {
+    email: string,
+    password: string,
+}    
+
 export type RegisterRequestDto = z.infer<typeof RegisterSchema>;

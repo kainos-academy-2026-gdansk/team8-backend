@@ -43,8 +43,6 @@ describe("POST /api/auth/register", () => {
 	});
 
 	it("returns status 400 when passwords do not match", async () => {
-		registerMock.mockRejectedValueOnce(new Error("Passwords do not match"));
-
 		const response = await request(app).post("/api/auth/register").send({
 			email: "john.doe@example.com",
 			password: "StrongPass!1",
@@ -52,7 +50,8 @@ describe("POST /api/auth/register", () => {
 		});
 
 		expect(response.status).toBe(400);
-		expect(response.body).toEqual({ error: "Passwords do not match" });
+		expect(response.body).toEqual({ error: "Invalid request body" });
+		expect(registerMock).not.toHaveBeenCalled();
 	});
 
 	it("returns status 409 when email already exists", async () => {

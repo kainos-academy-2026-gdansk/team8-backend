@@ -1,20 +1,17 @@
 import argon2 from "argon2";
-import type { UserDaoImpl } from "../dao/userDaoImpl";
-import type { RegisterRequestDto } from "../dtos/UserDto";
+import type { UserDao } from "../dao/userDao";
+import type { RegisterRequestDto, RegisterResponseDto } from "../dtos/UserDto";
 
 export class AuthService {
-    constructor(private userDao: UserDaoImpl) {}
+    constructor(private userDao: UserDao) {}
     
-    public async register(input: RegisterRequestDto) {
-        if (input.password !== input.confirmPassword) {
-            throw new Error("Passwords do not match");
-        }
-
+    public async register(input: RegisterRequestDto): Promise<RegisterResponseDto> {
         if (await this.userDao.emailExists(input.email)) {
             throw new Error("Email already exists");
         }
 
         const hashedPassword = await argon2.hash(input.password);
-        await this.userDao.register({ ...input, password: hashedPassword });
+        const user = await this.userDao.register({ ...input, password: hashedPassword });
+        return user;
     }
 }

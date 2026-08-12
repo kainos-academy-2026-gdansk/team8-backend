@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { UserDaoImpl } from "../../src/dao/userDaoImpl";
+import type { UserDao } from "../../src/dao/userDao";
 import { AuthService } from "../../src/services/authService";
 
 vi.mock("argon2", () => ({
@@ -14,32 +14,13 @@ describe("AuthService", () => {
 		vi.clearAllMocks();
 	});
 
-	it("throws when passwords do not match", async () => {
-		const dao = {
-			emailExists: vi.fn(),
-			register: vi.fn(),
-		} as unknown as UserDaoImpl;
 
-		const service = new AuthService(dao);
-
-		await expect(
-			service.register({
-				email: "john.doe@example.com",
-				password: "StrongPass!1",
-				confirmPassword: "DifferentPass!1",
-			}),
-		).rejects.toThrow("Passwords do not match");
-
-		expect(dao.emailExists).not.toHaveBeenCalled();
-		expect(dao.register).not.toHaveBeenCalled();
-		expect(argon2.hash).not.toHaveBeenCalled();
-	});
 
 	it("throws when email already exists", async () => {
 		const dao = {
 			emailExists: vi.fn().mockResolvedValue(true),
 			register: vi.fn(),
-		} as unknown as UserDaoImpl;
+		} as unknown as UserDao;
 
 		const service = new AuthService(dao);
 
@@ -59,14 +40,19 @@ describe("AuthService", () => {
 	it("hashes password and registers user when input is valid", async () => {
 		vi.mocked(argon2.hash).mockResolvedValue("hashed-password");
 
+		const user = {
+			email: "john.doe@example.com",
+			password: "hashed-password",
+		};
+
 		const dao = {
 			emailExists: vi.fn().mockResolvedValue(false),
-			register: vi.fn().mockResolvedValue(undefined),
-		} as unknown as UserDaoImpl;
+			register: vi.fn().mockResolvedValue(user),
+		} as unknown as UserDao;
 
 		const service = new AuthService(dao);
 
-		await service.register({
+		const result = await service.register({
 			email: "john.doe@example.com",
 			password: "StrongPass!1",
 			confirmPassword: "StrongPass!1",
@@ -79,6 +65,7 @@ describe("AuthService", () => {
 			password: "hashed-password",
 			confirmPassword: "StrongPass!1",
 		});
+		expect(result).toEqual(user);
 	});
 
 	it("propagates hashing errors", async () => {
@@ -87,7 +74,7 @@ describe("AuthService", () => {
 		const dao = {
 			emailExists: vi.fn().mockResolvedValue(false),
 			register: vi.fn(),
-		} as unknown as UserDaoImpl;
+		} as unknown as UserDao;
 
 		const service = new AuthService(dao);
 

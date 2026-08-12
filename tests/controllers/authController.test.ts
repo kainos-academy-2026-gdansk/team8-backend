@@ -17,7 +17,7 @@ describe("AuthController", () => {
 	});
 
 	it("returns status 201 when registration succeeds", async () => {
-		const user = { id: 1, email: "john.doe@example.com" };
+		const user = { email: "john.doe@example.com", password: "hashed-password" };
 		const body = {
 			email: "john.doe@example.com",
 			password: "StrongPass!1",
@@ -43,13 +43,19 @@ describe("AuthController", () => {
 		expect(Logger.debug).toHaveBeenCalledTimes(1);
 	});
 
-	it("returns status 400 when passwords do not match", async () => {
+	it("returns status 400 when schema validation fails", async () => {
 		const service = {
-			register: vi.fn().mockRejectedValue(new Error("Passwords do not match")),
+			register: vi.fn(),
 		} as unknown as AuthService;
 
 		const controller = new AuthController(service);
-		const req = { body: {} } as Request;
+		const req = {
+			body: {
+				email: "john.doe@example.com",
+				password: "StrongPass!1",
+				confirmPassword: "DifferentPass!1",
+			},
+		} as Request;
 		const res = {
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
@@ -58,8 +64,8 @@ describe("AuthController", () => {
 		await controller.register(req, res);
 
 		expect(res.status).toHaveBeenCalledWith(400);
-		expect(res.json).toHaveBeenCalledWith({ error: "Passwords do not match" });
-		expect(Logger.error).not.toHaveBeenCalled();
+		expect(res.json).toHaveBeenCalledWith({ error: "Invalid request body" });
+		expect(service.register).not.toHaveBeenCalled();
 	});
 
 	it("returns status 409 when email already exists", async () => {
@@ -68,7 +74,13 @@ describe("AuthController", () => {
 		} as unknown as AuthService;
 
 		const controller = new AuthController(service);
-		const req = { body: {} } as Request;
+		const req = {
+			body: {
+				email: "john.doe@example.com",
+				password: "StrongPass!1",
+				confirmPassword: "StrongPass!1",
+			},
+		} as Request;
 		const res = {
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
@@ -87,7 +99,13 @@ describe("AuthController", () => {
 		} as unknown as AuthService;
 
 		const controller = new AuthController(service);
-		const req = { body: {} } as Request;
+		const req = {
+			body: {
+				email: "john.doe@example.com",
+				password: "StrongPass!1",
+				confirmPassword: "StrongPass!1",
+			},
+		} as Request;
 		const res = {
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
