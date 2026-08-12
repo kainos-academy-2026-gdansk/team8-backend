@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { UserRole } from "../models/UserRole";
 
 export const RegisterSchema = z
     .object({
@@ -16,9 +17,11 @@ export const RegisterSchema = z
         path: ["confirmPassword"],
     });
 
+
+
 export type RegisterResponseDto = {
     email: string,
-    password: string,
+    role: UserRole,
 }    
 
 export type RegisterRequestDto = z.infer<typeof RegisterSchema>;

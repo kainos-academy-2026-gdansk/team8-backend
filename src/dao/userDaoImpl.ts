@@ -1,4 +1,5 @@
 import type { RegisterRequestDto, RegisterResponseDto } from "../dtos/UserDto";
+import { fromPrismaUserRole } from "../mappers/userMapper";
 import prisma from "../prismaClient";
 import type { UserDao } from "./userDao";
 
@@ -15,6 +16,6 @@ export class UserDaoImpl implements UserDao {
                 passwordHash: input.password,
             },
     });
-        return { email: user.email, password: user.passwordHash };
+        return { email: user.email, role: fromPrismaUserRole(user.role) };
     }
 }   
