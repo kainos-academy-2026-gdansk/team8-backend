@@ -37,7 +37,7 @@ describe("GET /api/job-roles", () => {
 				capability: { id: 1, name: "Engineering" },
 				band: { id: 2, name: "B2" },
 				closingDate: "2026-12-31T00:00:00.000Z",
-				status: "OPEN",
+				status: { id: 1, name: "OPEN" },
 			},
 		];
 
