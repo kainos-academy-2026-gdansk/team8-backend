@@ -10,19 +10,25 @@ datasource db {
 model JobRole {
   id Int @id @default(autoincrement())
   roleName String
+  description String
+  responsibilities String
+  sharepointUrl String
   location String
   capability Capability @relation(fields: [capabilityId], references: [id])
   capabilityId Int
   band Band @relation(fields: [bandId], references: [id])
   bandId Int
   closingDate DateTime
-  status JobRoleStatus
+  // status JobRoleStatus
+  status Status @relation(fields: [statusId], references: [id])
+  statusId Int
+  numberOfOpenPositions Int
 }
 
-enum JobRoleStatus {
-  OPEN
-  CLOSED
-}
+// enum JobRoleStatus {
+//   OPEN
+//   CLOSED
+// }
 
 model Capability {
   id Int @id @default(autoincrement())
@@ -34,4 +40,10 @@ model Band {
    id Int @id @default(autoincrement())
    name String
    jobRoles JobRole[]
+}
+
+model Status {
+  id Int @id @default(autoincrement())
+  name String
+  jobRoles JobRole[]
 }

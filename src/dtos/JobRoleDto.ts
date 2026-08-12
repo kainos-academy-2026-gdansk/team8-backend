@@ -1,5 +1,6 @@
 import type { Band } from "../models/Band";
 import type { Capability } from "../models/Capability";
+import type { Status } from "../models/Status";
 
 export type JobRoleResponse = {
 	id: number;
@@ -8,5 +9,19 @@ export type JobRoleResponse = {
 	capability: Capability;
 	band: Band;
 	closingDate: Date;
-	status: "OPEN" | "CLOSED";
+	status: Status;
+};
+
+export type JobRoleDetailedResponse = {
+	id: number;
+	roleName: string;
+	description: string;
+	responsibilities: string;
+	sharepointUrl: string;
+	location: string;
+	capability: Capability;
+	band: Band;
+	closingDate: Date;
+	status: Status;
+	numberOfOpenPositions: number;
 };

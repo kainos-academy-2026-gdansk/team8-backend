@@ -1,9 +1,8 @@
 import type { Request, Response } from "express";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { JobRoleController } from "../../src/controllers/jobRoleController";
 import Logger from "../../src/lib/logger";
 import type { JobRoleService } from "../../src/services/jobRoleService";
-
 
 vi.mock("../../src/lib/logger", () => ({
 	default: {
@@ -12,6 +11,10 @@ vi.mock("../../src/lib/logger", () => ({
 }));
 
 describe("JobRoleController", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
 	it("returns status 200 with job roles when service succeeds", async () => {
 		const jobRoles = [
 			{
@@ -21,7 +24,7 @@ describe("JobRoleController", () => {
 				capability: { id: 1, name: "Engineering" },
 				band: { id: 2, name: "B2" },
 				closingDate: new Date("2026-12-31T00:00:00.000Z"),
-				status: "OPEN",
+				status: { id: 1, name: "OPEN" },
 			},
 		];
 
@@ -61,6 +64,101 @@ describe("JobRoleController", () => {
 		expect(res.status).toHaveBeenCalledWith(500);
 		expect(res.json).toHaveBeenCalledWith({
 			error: "Failed to fetch job roles",
+		});
+		expect(Logger.error).toHaveBeenCalledTimes(1);
+	});
+
+	it("returns status 200 with job role when getById succeeds", async () => {
+		const jobRole = {
+			id: 1,
+			roleName: "Software Engineer",
+			description: "Role description",
+			responsibilities: "Build APIs",
+			sharepointUrl: "https://company.sharepoint.com/sites/job-specs/se",
+			location: "Gdansk",
+			capability: { id: 1, name: "Engineering" },
+			band: { id: 2, name: "B2" },
+			closingDate: new Date("2026-12-31T00:00:00.000Z"),
+			status: { id: 1, name: "OPEN" },
+			numberOfOpenPositions: 2,
+		};
+
+		const service = {
+			getById: vi.fn().mockResolvedValue(jobRole),
+		} as unknown as JobRoleService;
+
+		const controller = new JobRoleController(service);
+		const req = { params: { id: "1" } } as unknown as Request;
+		const res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getById(req, res);
+
+		expect(service.getById).toHaveBeenCalledWith(1);
+		expect(res.status).toHaveBeenCalledWith(200);
+		expect(res.json).toHaveBeenCalledWith(jobRole);
+	});
+
+	it("returns status 404 when getById returns null", async () => {
+		const service = {
+			getById: vi.fn().mockResolvedValue(null),
+		} as unknown as JobRoleService;
+
+		const controller = new JobRoleController(service);
+		const req = { params: { id: "99" } } as unknown as Request;
+		const res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getById(req, res);
+
+		expect(service.getById).toHaveBeenCalledWith(99);
+		expect(res.status).toHaveBeenCalledWith(404);
+		expect(res.json).toHaveBeenCalledWith({ error: "Job role not found" });
+	});
+
+	it("returns status 400 for invalid id", async () => {
+		const service = {
+			getById: vi.fn(),
+		} as unknown as JobRoleService;
+
+		const controller = new JobRoleController(service);
+		const req = { params: { id: "abc" } } as unknown as Request;
+		const res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getById(req, res);
+
+		expect(service.getById).not.toHaveBeenCalled();
+		expect(res.status).toHaveBeenCalledWith(400);
+		expect(res.json).toHaveBeenCalledWith({
+			error: "Id should be a positive number",
+		});
+	});
+
+	it("returns status 500 when getById throws", async () => {
+		const service = {
+			getById: vi.fn().mockRejectedValue(new Error("DB down")),
+		} as unknown as JobRoleService;
+
+		const controller = new JobRoleController(service);
+		const req = { params: { id: "1" } } as unknown as Request;
+		const res = {
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getById(req, res);
+
+		expect(service.getById).toHaveBeenCalledWith(1);
+		expect(res.status).toHaveBeenCalledWith(500);
+		expect(res.json).toHaveBeenCalledWith({
+			error: "Failed to fetch job role",
 		});
 		expect(Logger.error).toHaveBeenCalledTimes(1);
 	});

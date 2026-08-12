@@ -38,6 +38,8 @@ const bandNames = [
 	"Director",
 ];
 
+const statusNames = ["OPEN", "CLOSED"];
+
 const locations = [
 	"Belfast",
 	"London",
@@ -72,8 +74,22 @@ const jobRoleSeeds = [
 	{ roleName: "Solution Architect", capability: "Solution Architecture" },
 ];
 
+function buildDescription(roleName: string): string {
+	return `${roleName} role supporting delivery across client and internal initiatives.`;
+}
+
+function buildResponsibilities(roleName: string): string {
+	return `Design, implement, and maintain solutions as a ${roleName}; collaborate with cross-functional teams and uphold engineering standards.`;
+}
+
+function buildSharepointUrl(roleName: string): string {
+	const slug = roleName.toLowerCase().replace(/\s+/g, "-");
+	return `https://company.sharepoint.com/sites/job-specs/${slug}`;
+}
+
 async function main() {
 	await prisma.jobRole.deleteMany();
+	await prisma.status.deleteMany();
 	await prisma.capability.deleteMany();
 	await prisma.band.deleteMany();
 
@@ -85,26 +101,40 @@ async function main() {
 		data: bandNames.map((name) => ({ name })),
 	});
 
-	const capabilities = await prisma.capability.findMany();
-	const bands = await prisma.band.findMany();
+	await prisma.status.createMany({
+		data: statusNames.map((name) => ({ name })),
+	});
 
-	if (capabilities.length < 10 || bands.length < 10) {
-		throw new Error(
-			"Expected at least 10 capabilities and 10 bands after seed insert.",
-		);
-	}
+	const [capabilities, bands, statuses] = await Promise.all([
+		prisma.capability.findMany(),
+		prisma.band.findMany(),
+		prisma.status.findMany(),
+	]);
 
-	const capabilityByName = new Map(capabilities.map((c) => [c.name, c]));
+	const capabilityByName = new Map(
+		capabilities.map((item) => [item.name, item]),
+	);
+	const statusByName = new Map(statuses.map((item) => [item.name, item]));
 	const now = new Date();
 
 	await prisma.jobRole.createMany({
-		data: jobRoleSeeds.map((role, index) => {
-			const capability = capabilityByName.get(role.capability);
+		data: jobRoleSeeds.map((seed, index) => {
+			const capability = capabilityByName.get(seed.capability);
 			if (!capability) {
-				throw new Error(`Missing capability for role: ${role.roleName}`);
+				throw new Error(`Missing capability for role: ${seed.roleName}`);
 			}
+
+			const statusName = index % 2 === 0 ? "OPEN" : "CLOSED";
+			const status = statusByName.get(statusName);
+			if (!status) {
+				throw new Error(`Missing status: ${statusName}`);
+			}
+
 			return {
-				roleName: role.roleName,
+				roleName: seed.roleName,
+				description: buildDescription(seed.roleName),
+				responsibilities: buildResponsibilities(seed.roleName),
+				sharepointUrl: buildSharepointUrl(seed.roleName),
 				location: locations[index % locations.length],
 				capabilityId: capability.id,
 				bandId: bands[index % bands.length].id,
@@ -113,19 +143,22 @@ async function main() {
 					now.getMonth(),
 					now.getDate() + index + 7,
 				),
-				status: index % 2 === 0 ? "OPEN" : "CLOSED",
+				statusId: status.id,
+				numberOfOpenPositions: (index % 3) + 1,
 			};
 		}),
 	});
 
-	const [capabilityCount, bandCount, jobRoleCount] = await Promise.all([
-		prisma.capability.count(),
-		prisma.band.count(),
-		prisma.jobRole.count(),
-	]);
+	const [capabilityCount, bandCount, statusCount, jobRoleCount] =
+		await Promise.all([
+			prisma.capability.count(),
+			prisma.band.count(),
+			prisma.status.count(),
+			prisma.jobRole.count(),
+		]);
 
 	console.log(
-		`Seed complete: ${capabilityCount} capabilities, ${bandCount} bands, ${jobRoleCount} job roles.`,
+		`Seed complete: ${capabilityCount} capabilities, ${bandCount} bands, ${statusCount} statuses, ${jobRoleCount} job roles.`,
 	);
 }
 
