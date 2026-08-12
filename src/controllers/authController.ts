@@ -15,16 +15,10 @@ export class AuthController {
         return;
       }
       const user = await this.authService.register(parsed.data);
-      Logger.debug(`User registered successfully: ${JSON.stringify(user)}`);
+      Logger.debug(`User registered successfully: ${`email:${user.email}` + `, role:${user.role}`}`);
       res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message === "Passwords do not match") {
-          Logger.debug(`Password mismatch during registration: ${String(error)}`);
-          res.status(400).json({ error: error.message });
-          return;
-        }
-
         if (error.message === "Email already exists") {
           Logger.debug(`Email already exists during registration: ${String(error)}`);
           res.status(409).json({ error: error.message });
