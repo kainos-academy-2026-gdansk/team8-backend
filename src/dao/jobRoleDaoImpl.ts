@@ -4,12 +4,19 @@ import prisma from "../prismaClient";
 import type { JobRoleDao } from "./jobRoleDao";
 
 export class JobRoleDaoImpl implements JobRoleDao {
-	async getAll(): Promise<JobRole[]> {
+	async getAll(limit: number, offset: number): Promise<JobRole[]> {
 		const jobs = await prisma.jobRole.findMany({
+			take: limit,
+			skip: offset,
+			orderBy: { id: "asc" },
 			include: { capability: true, band: true, status: true },
 		});
 
 		return jobs.map(mapPrismaJobRoleToJobRole);
+	}
+
+	async countAll(): Promise<number> {
+		return prisma.jobRole.count();
 	}
 
 	async getById(id: number): Promise<JobRole | null> {

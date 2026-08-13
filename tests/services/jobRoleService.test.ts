@@ -30,19 +30,22 @@ function createJobRole(): JobRole {
 }
 
 describe("JobRoleService", () => {
-	it("maps DAO result to JobRoleResponse list", async () => {
+	it("maps DAO paginated result to response list with metadata", async () => {
 		const daoResult = [createJobRole()];
 
 		const dao = {
 			getAll: vi.fn().mockResolvedValue(daoResult),
+			countAll: vi.fn().mockResolvedValue(25),
 		} as unknown as JobRoleDao;
 
 		const service = new JobRoleService(dao);
-		const result = await service.getAll();
+		const result = await service.getAll({ limit: 10, offset: 10 });
 
-		expect(dao.getAll).toHaveBeenCalledTimes(1);
-		expect(result).toHaveLength(1);
-		expect(result[0]).toEqual({
+		expect(dao.getAll).toHaveBeenCalledWith(10, 10);
+		expect(dao.countAll).toHaveBeenCalledTimes(1);
+		expect(result).toEqual({
+			data: [
+				{
 			id: 1,
 			roleName: "Software Engineer",
 			location: "Gdansk",
@@ -50,6 +53,14 @@ describe("JobRoleService", () => {
 			band: { id: 2, name: "B2" },
 			closingDate: new Date("2026-12-31T00:00:00.000Z"),
 			status: { id: 1, name: "OPEN" },
+				},
+			],
+			total: 25,
+			limit: 10,
+			offset: 10,
+			hasPrevious: true,
+			hasNext: true,
+			lastOffset: 20,
 		});
 	});
 
@@ -95,12 +106,15 @@ describe("JobRoleService", () => {
 	it("throws when DAO fails", async () => {
 		const dao = {
 			getAll: vi.fn().mockRejectedValue(new Error("Database error")),
+			countAll: vi.fn().mockResolvedValue(0),
 		} as unknown as JobRoleDao;
 
 		const service = new JobRoleService(dao);
 
-		await expect(service.getAll()).rejects.toThrow("Database error");
-		expect(dao.getAll).toHaveBeenCalledTimes(1);
+		await expect(service.getAll({ limit: 10, offset: 0 })).rejects.toThrow(
+			"Database error",
+		);
+		expect(dao.getAll).toHaveBeenCalledWith(10, 0);
 	});
 
 	it("throws when DAO getById fails", async () => {
