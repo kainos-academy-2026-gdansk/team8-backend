@@ -1,4 +1,4 @@
-import type { RegisterResponseDto } from "../dtos/UserDto";
+import type { LoginRequestDto, RegisterResponseDto } from "../dtos/UserDto";
 import { fromPrismaUserRole } from "../mappers/userMapper";
 import prisma from "../prismaClient";
 import type { UserDao } from "./userDao";
@@ -26,5 +26,30 @@ export class UserDaoImpl implements UserDao {
 			},
 		});
 		return { email: user.email, role: fromPrismaUserRole(user.role) };
+	}
+
+	async login(data: LoginRequestDto): Promise<{
+		id: number;
+		email: string;
+		role: string;
+		passwordHash: string;
+	} | null> {
+		const user = await prisma.user.findUnique({
+			where: { email: data.email },
+			select: {
+				id: true,
+				email: true,
+				role: true,
+				passwordHash: true,
+			},
+		});
+		return user
+			? {
+					id: user.id,
+					email: user.email,
+					role: fromPrismaUserRole(user.role),
+					passwordHash: user.passwordHash,
+				}
+			: null;
 	}
 }

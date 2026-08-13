@@ -57,21 +57,102 @@ const locations = [
 const jobRoleSeeds = [
 	{ roleName: "Software Engineer", capability: "Software Engineering" },
 	{ roleName: "Senior Software Engineer", capability: "Software Engineering" },
+	{ roleName: "Lead Software Engineer", capability: "Software Engineering" },
+	{
+		roleName: "Principal Software Engineer",
+		capability: "Software Engineering",
+	},
+	{ roleName: "Full Stack Engineer", capability: "Software Engineering" },
+	{ roleName: "Backend Engineer", capability: "Software Engineering" },
 	{ roleName: "Cloud Engineer", capability: "Cloud" },
+	{ roleName: "Senior Cloud Engineer", capability: "Cloud" },
+	{ roleName: "Cloud Consultant", capability: "Cloud" },
+	{ roleName: "Cloud Platform Consultant", capability: "Cloud" },
 	{ roleName: "DevOps Engineer", capability: "DevOps" },
+	{ roleName: "Senior DevOps Engineer", capability: "DevOps" },
+	{ roleName: "Site Reliability Engineer", capability: "DevOps" },
+	{ roleName: "DevSecOps Engineer", capability: "DevOps" },
 	{ roleName: "Platform Engineer", capability: "Platform Engineering" },
+	{
+		roleName: "Senior Platform Engineer",
+		capability: "Platform Engineering",
+	},
+	{
+		roleName: "Kubernetes Platform Engineer",
+		capability: "Platform Engineering",
+	},
 	{ roleName: "Test Engineer", capability: "Quality Engineering" },
+	{ roleName: "Senior Test Engineer", capability: "Quality Engineering" },
+	{
+		roleName: "Automation Test Engineer",
+		capability: "Quality Engineering",
+	},
+	{ roleName: "QA Consultant", capability: "Quality Engineering" },
 	{ roleName: "Data Engineer", capability: "Data & Analytics" },
+	{ roleName: "Senior Data Engineer", capability: "Data & Analytics" },
+	{ roleName: "Analytics Engineer", capability: "Data & Analytics" },
+	{ roleName: "Data Analytics Consultant", capability: "Data & Analytics" },
 	{
 		roleName: "Machine Learning Engineer",
 		capability: "Artificial Intelligence & Machine Learning",
 	},
+	{
+		roleName: "Senior Machine Learning Engineer",
+		capability: "Artificial Intelligence & Machine Learning",
+	},
+	{
+		roleName: "MLOps Engineer",
+		capability: "Artificial Intelligence & Machine Learning",
+	},
 	{ roleName: "Experience Designer", capability: "Experience Design" },
+	{
+		roleName: "Senior Experience Designer",
+		capability: "Experience Design",
+	},
+	{ roleName: "UX Researcher", capability: "Experience Design" },
 	{ roleName: "Product Manager", capability: "Product Management" },
+	{ roleName: "Senior Product Manager", capability: "Product Management" },
+	{
+		roleName: "Technical Product Manager",
+		capability: "Product Management",
+	},
 	{ roleName: "Business Analyst", capability: "Business Analysis" },
+	{
+		roleName: "Senior Business Analyst",
+		capability: "Business Analysis",
+	},
+	{ roleName: "Lead Business Analyst", capability: "Business Analysis" },
 	{ roleName: "Cyber Security Consultant", capability: "Cyber Security" },
+	{
+		roleName: "Senior Cyber Security Consultant",
+		capability: "Cyber Security",
+	},
+	{ roleName: "Security Engineer", capability: "Cyber Security" },
+	{ roleName: "IAM Consultant", capability: "Cyber Security" },
 	{ roleName: "Workday Consultant", capability: "Workday" },
+	{ roleName: "Senior Workday Consultant", capability: "Workday" },
+	{
+		roleName: "Workday Integration Consultant",
+		capability: "Workday",
+	},
 	{ roleName: "Solution Architect", capability: "Solution Architecture" },
+	{
+		roleName: "Senior Solution Architect",
+		capability: "Solution Architecture",
+	},
+	{
+		roleName: "Enterprise Solution Architect",
+		capability: "Solution Architecture",
+	},
+	{
+		roleName: "Cloud Solution Architect",
+		capability: "Solution Architecture",
+	},
+	{
+		roleName: "Principal Solution Architect",
+		capability: "Solution Architecture",
+	},
+	{ roleName: "Technical Architect", capability: "Solution Architecture" },
 ];
 
 function buildDescription(roleName: string): string {

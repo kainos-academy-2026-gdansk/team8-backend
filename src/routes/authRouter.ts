@@ -8,4 +8,6 @@ const controller = new AuthController(new AuthService(new UserDaoImpl()));
 
 router.post("/register", async (_req, res) => controller.register(_req, res));
 
+router.post("/login", async (_req, res) => controller.login(_req, res));
+
 export default router;
