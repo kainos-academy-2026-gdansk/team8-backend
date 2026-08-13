@@ -53,6 +53,9 @@ jobs:
             type=sha
             type=raw,value=latest
 
+      - name: Ensure optional certificate directory exists
+        run: mkdir -p certs
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
