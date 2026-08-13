@@ -19,4 +19,11 @@ Use this file for approved technical decisions and their rationale.
 - Alternatives considered: Keep plain array response and expose pagination via headers only.
 - Rationale: UI needs first/previous/next/last navigation data in payload and backend must avoid unbounded result sets.
 - Consequences: Consumers of GET /api/job-roles should read `data` and `links` instead of assuming array root.
+
+- Date: 2026-08-13
+- Task: US-028 job role filtering
+- Decision: GET /api/job-roles accepts optional filters (`roleName`, `location` case-insensitive contains; repeatable `capability`/`band`/`status` matched by relation name; `closingDateBefore`/`closingDateAfter` range). Invalid filter values are silently dropped (never 400). When any filter is active, pagination is bypassed: all matching rows returned with `offset=0`, `limit=total=data.length`, `links.previous=links.next=null`.
+- Alternatives considered: 400 on invalid filters; keeping pagination while filtering.
+- Rationale: Applicants need complete filtered result sets; lenient parsing keeps the UI resilient to stray query params.
+- Consequences: Filtered responses can be unbounded (accepted at current scale); pagination params are still validated (400) even when ignored due to filtering.
 - Update only when this category is impacted by a task.

@@ -12,8 +12,8 @@ export class JobRoleController {
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const { pagination } = res.locals as JobRoleListLocals;
-			const result = await this.jobRoleService.getAll(pagination);
+			const { pagination, filters } = res.locals as JobRoleListLocals;
+			const result = await this.jobRoleService.getAll({ pagination, filters });
 			const basePath = req.baseUrl;
 
 			const toLink = (value: number) =>
@@ -26,10 +26,14 @@ export class JobRoleController {
 				offset: result.offset,
 				links: {
 					first: toLink(0),
-					previous: result.hasPrevious
-						? toLink(Math.max(result.offset - result.limit, 0))
-						: null,
-					next: result.hasNext ? toLink(result.offset + result.limit) : null,
+					previous:
+						!result.filtered && result.hasPrevious
+							? toLink(Math.max(result.offset - result.limit, 0))
+							: null,
+					next:
+						!result.filtered && result.hasNext
+							? toLink(result.offset + result.limit)
+							: null,
 					last: toLink(result.lastOffset),
 				},
 			};

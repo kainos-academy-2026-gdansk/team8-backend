@@ -1,7 +1,7 @@
 ---
 name: read-workflow-planner
 description: Reads task context, prepares story artifacts under .ai, and creates an approved implementation plan for a backend user story.
-tools: [read_file, file_search, grep_search, create_directory, create_file, apply_patch, run_in_terminal]
+tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 ---
 
 # Read Workflow Planner Agent

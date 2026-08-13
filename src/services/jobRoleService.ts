@@ -1,4 +1,4 @@
-import type { JobRoleDao } from "../dao/jobRoleDao";
+import type { JobRoleDao, JobRoleListFilters } from "../dao/jobRoleDao";
 import {
 	mapJobRoleToJobRoleResponses,
 	mapJobRoleToJobRoleDetailedResponse,
@@ -21,14 +21,52 @@ export type JobRoleListResult = {
 	hasPrevious: boolean;
 	hasNext: boolean;
 	lastOffset: number;
+	filtered: boolean;
 };
+
+export type JobRoleListParams = {
+	pagination: JobRoleListPagination;
+	filters: JobRoleListFilters;
+};
+
+function hasActiveFilters(filters: JobRoleListFilters): boolean {
+	return (
+		filters.roleName !== undefined ||
+		filters.location !== undefined ||
+		(filters.capabilities !== undefined && filters.capabilities.length > 0) ||
+		(filters.bands !== undefined && filters.bands.length > 0) ||
+		(filters.statuses !== undefined && filters.statuses.length > 0) ||
+		filters.closingDateAfter !== undefined ||
+		filters.closingDateBefore !== undefined
+	);
+}
 
 export class JobRoleService {
 	constructor(private dao: JobRoleDao) {}
 
-	async getAll(pagination: JobRoleListPagination): Promise<JobRoleListResult> {
+	async getAll(params: JobRoleListParams): Promise<JobRoleListResult> {
+		const { pagination, filters } = params;
+
+		if (hasActiveFilters(filters)) {
+			const jobRoles = await this.dao.getAll({ filters });
+			const data = mapJobRoleToJobRoleResponses(jobRoles);
+
+			return {
+				data,
+				total: data.length,
+				limit: data.length,
+				offset: 0,
+				hasPrevious: false,
+				hasNext: false,
+				lastOffset: 0,
+				filtered: true,
+			};
+		}
+
 		const [jobRoles, total] = await Promise.all([
-			this.dao.getAll(pagination.limit, pagination.offset),
+			this.dao.getAll({
+				pagination: { limit: pagination.limit, offset: pagination.offset },
+			}),
 			this.dao.countAll(),
 		]);
 
@@ -45,6 +83,7 @@ export class JobRoleService {
 			hasPrevious: pagination.offset > 0,
 			hasNext: pagination.offset + pagination.limit < total,
 			lastOffset,
+			filtered: false,
 		};
 	}
 
@@ -53,3 +92,5 @@ export class JobRoleService {
 		return jobRole ? mapJobRoleToJobRoleDetailedResponse(jobRole) : null;
 	}
 }
+
+export type { JobRoleListFilters } from "../dao/jobRoleDao";
