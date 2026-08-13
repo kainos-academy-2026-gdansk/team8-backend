@@ -46,6 +46,9 @@ describe("JobRoleController", () => {
 			baseUrl: "/api/job-roles",
 		} as unknown as Request;
 		const res = {
+			locals: {
+				pagination: { limit: 10, offset: 0 },
+			},
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -78,6 +81,9 @@ describe("JobRoleController", () => {
 			query: {},
 		} as unknown as Request;
 		const res = {
+			locals: {
+				pagination: { limit: 10, offset: 0 },
+			},
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -90,30 +96,6 @@ describe("JobRoleController", () => {
 			error: "Failed to fetch job roles",
 		});
 		expect(Logger.error).toHaveBeenCalledTimes(1);
-	});
-
-	it("returns status 400 for invalid pagination query params", async () => {
-		const service = {
-			getAll: vi.fn(),
-		} as unknown as JobRoleService;
-
-		const controller = new JobRoleController(service);
-		const req = {
-			query: { limit: "0", offset: "-1" },
-		} as unknown as Request;
-		const res = {
-			status: vi.fn().mockReturnThis(),
-			json: vi.fn(),
-		} as unknown as Response;
-
-		await controller.getAll(req, res);
-
-		expect(service.getAll).not.toHaveBeenCalled();
-		expect(res.status).toHaveBeenCalledWith(400);
-		expect(res.json).toHaveBeenCalledWith({
-			error:
-				"limit must be a positive integer and offset must be a non-negative integer",
-		});
 	});
 
 	it("returns status 200 with job role when getById succeeds", async () => {
@@ -138,6 +120,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "1" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 1 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -157,6 +140,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "99" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 99 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -168,27 +152,6 @@ describe("JobRoleController", () => {
 		expect(res.json).toHaveBeenCalledWith({ error: "Job role not found" });
 	});
 
-	it("returns status 400 for invalid id", async () => {
-		const service = {
-			getById: vi.fn(),
-		} as unknown as JobRoleService;
-
-		const controller = new JobRoleController(service);
-		const req = { params: { id: "abc" } } as unknown as Request;
-		const res = {
-			status: vi.fn().mockReturnThis(),
-			json: vi.fn(),
-		} as unknown as Response;
-
-		await controller.getById(req, res);
-
-		expect(service.getById).not.toHaveBeenCalled();
-		expect(res.status).toHaveBeenCalledWith(400);
-		expect(res.json).toHaveBeenCalledWith({
-			error: "Id should be a positive number",
-		});
-	});
-
 	it("returns status 500 when getById throws", async () => {
 		const service = {
 			getById: vi.fn().mockRejectedValue(new Error("DB down")),
@@ -197,6 +160,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "1" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 1 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
