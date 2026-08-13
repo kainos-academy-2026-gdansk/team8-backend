@@ -32,10 +32,12 @@ describe("POST /api/auth/register", () => {
 			password: "StrongPass!1",
 			confirmPassword: "StrongPass!1",
 		};
-		const mockedResponse = { id: 1, email: payload.email };
+		const mockedResponse = { email: payload.email, role: "USER" };
 		registerMock.mockResolvedValueOnce(mockedResponse);
 
-		const response = await request(app).post("/api/auth/register").send(payload);
+		const response = await request(app)
+			.post("/api/auth/register")
+			.send(payload);
 
 		expect(response.status).toBe(201);
 		expect(response.body).toEqual(mockedResponse);

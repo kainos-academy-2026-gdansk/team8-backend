@@ -14,8 +14,6 @@ describe("AuthService", () => {
 		vi.clearAllMocks();
 	});
 
-
-
 	it("throws when email already exists", async () => {
 		const dao = {
 			emailExists: vi.fn().mockResolvedValue(true),
@@ -42,7 +40,7 @@ describe("AuthService", () => {
 
 		const user = {
 			email: "john.doe@example.com",
-			password: "hashed-password",
+			role: "USER",
 		};
 
 		const dao = {

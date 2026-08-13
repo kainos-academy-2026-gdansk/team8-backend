@@ -3,7 +3,6 @@ import { AuthController } from "../controllers/authController";
 import { UserDaoImpl } from "../dao/userDaoImpl";
 import { AuthService } from "../services/authService";
 
-
 const router = Router();
 const controller = new AuthController(new AuthService(new UserDaoImpl()));
 

@@ -7,7 +7,7 @@ export function fromPrismaUserRole(role: PrismaUserRole): UserRole {
 			return UserRole.ADMIN;
 		case "USER":
 			return UserRole.USER;
-	    default:
-       		throw new Error(`Unknown user role: ${role}`);
+		default:
+			throw new Error(`Unknown user role: ${role}`);
 	}
 }

@@ -17,7 +17,7 @@ describe("AuthController", () => {
 	});
 
 	it("returns status 201 when registration succeeds", async () => {
-		const user = { email: "john.doe@example.com", password: "hashed-password" };
+		const user = { email: "john.doe@example.com", role: "USER" };
 		const body = {
 			email: "john.doe@example.com",
 			password: "StrongPass!1",
