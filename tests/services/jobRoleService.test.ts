@@ -46,13 +46,13 @@ describe("JobRoleService", () => {
 		expect(result).toEqual({
 			data: [
 				{
-			id: 1,
-			roleName: "Software Engineer",
-			location: "Gdansk",
-			capability: { id: 1, name: "Engineering" },
-			band: { id: 2, name: "B2" },
-			closingDate: new Date("2026-12-31T00:00:00.000Z"),
-			status: { id: 1, name: "OPEN" },
+					id: 1,
+					roleName: "Software Engineer",
+					location: "Gdansk",
+					capability: { id: 1, name: "Engineering" },
+					band: { id: 2, name: "B2" },
+					closingDate: new Date("2026-12-31T00:00:00.000Z"),
+					status: { id: 1, name: "OPEN" },
 				},
 			],
 			total: 25,

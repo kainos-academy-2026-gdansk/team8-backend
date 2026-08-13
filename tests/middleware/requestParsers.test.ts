@@ -28,7 +28,9 @@ describe("parseIntegerWithDefault", () => {
 	});
 
 	it("returns null for values below min", () => {
-		expect(parseIntegerWithDefault("0", { defaultValue: 10, min: 1 })).toBeNull();
+		expect(
+			parseIntegerWithDefault("0", { defaultValue: 10, min: 1 }),
+		).toBeNull();
 	});
 });
 

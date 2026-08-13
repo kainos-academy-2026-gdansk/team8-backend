@@ -12,8 +12,6 @@ export type JobRoleResponse = {
 	status: Status;
 };
 
-
-
 export type JobRoleDetailedResponse = {
 	id: number;
 	roleName: string;
