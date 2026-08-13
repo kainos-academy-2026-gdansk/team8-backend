@@ -13,3 +13,5 @@ coverage/
 skills-lock.json
 logs/
 code_reviews/
+certs/*
+!certs/.gitkeep
