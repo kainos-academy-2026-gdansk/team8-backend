@@ -27,3 +27,18 @@ export type JobRoleDetailedResponse = {
 	status: Status;
 	numberOfOpenPositions: number;
 };
+
+export type PaginationLinks = {
+	first: string;
+	previous: string | null;
+	next: string | null;
+	last: string;
+};
+
+export type PaginatedJobRoleResponse = {
+	data: JobRoleResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+	links: PaginationLinks;
+};

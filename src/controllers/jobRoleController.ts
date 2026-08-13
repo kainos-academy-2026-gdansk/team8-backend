@@ -5,6 +5,7 @@ import type {
 	JobRoleIdLocals,
 	JobRoleListLocals,
 } from "../middleware/jobRoleRequestParsers";
+import type { PaginatedJobRoleResponse } from "../dtos/JobRoleDto";
 
 export class JobRoleController {
 	constructor(private readonly jobRoleService: JobRoleService) {}
@@ -18,7 +19,7 @@ export class JobRoleController {
 			const toLink = (value: number) =>
 				`${basePath}?limit=${result.limit}&offset=${value}`;
 
-			res.status(200).json({
+			const response: PaginatedJobRoleResponse = {
 				data: result.data,
 				total: result.total,
 				limit: result.limit,
@@ -31,7 +32,9 @@ export class JobRoleController {
 					next: result.hasNext ? toLink(result.offset + result.limit) : null,
 					last: toLink(result.lastOffset),
 				},
-			});
+			};
+
+			res.status(200).json(response);
 		} catch (error) {
 			Logger.error(`Failed to fetch job roles: ${String(error)}`);
 			res.status(500).json({ error: "Failed to fetch job roles" });
