@@ -16,34 +16,59 @@ describe("JobRoleController", () => {
 	});
 
 	it("returns status 200 with job roles when service succeeds", async () => {
-		const jobRoles = [
-			{
-				id: 1,
-				roleName: "Software Engineer",
-				location: "Gdansk",
-				capability: { id: 1, name: "Engineering" },
-				band: { id: 2, name: "B2" },
-				closingDate: new Date("2026-12-31T00:00:00.000Z"),
-				status: { id: 1, name: "OPEN" },
-			},
-		];
+		const jobRoles = {
+			data: [
+				{
+					id: 1,
+					roleName: "Software Engineer",
+					location: "Gdansk",
+					capability: { id: 1, name: "Engineering" },
+					band: { id: 2, name: "B2" },
+					closingDate: new Date("2026-12-31T00:00:00.000Z"),
+					status: { id: 1, name: "OPEN" },
+				},
+			],
+			total: 11,
+			limit: 10,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: true,
+			lastOffset: 10,
+		};
 
 		const service = {
 			getAll: vi.fn().mockResolvedValue(jobRoles),
 		} as unknown as JobRoleService;
 
 		const controller = new JobRoleController(service);
-		const req = {} as Request;
+		const req = {
+			query: {},
+			baseUrl: "/api/job-roles",
+		} as unknown as Request;
 		const res = {
+			locals: {
+				pagination: { limit: 10, offset: 0 },
+			},
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
 
 		await controller.getAll(req, res);
 
-		expect(service.getAll).toHaveBeenCalledTimes(1);
+		expect(service.getAll).toHaveBeenCalledWith({ limit: 10, offset: 0 });
 		expect(res.status).toHaveBeenCalledWith(200);
-		expect(res.json).toHaveBeenCalledWith(jobRoles);
+		expect(res.json).toHaveBeenCalledWith({
+			data: jobRoles.data,
+			total: 11,
+			limit: 10,
+			offset: 0,
+			links: {
+				first: "/api/job-roles?limit=10&offset=0",
+				previous: null,
+				next: "/api/job-roles?limit=10&offset=10",
+				last: "/api/job-roles?limit=10&offset=10",
+			},
+		});
 	});
 
 	it("returns status 500 when service throws", async () => {
@@ -52,8 +77,13 @@ describe("JobRoleController", () => {
 		} as unknown as JobRoleService;
 
 		const controller = new JobRoleController(service);
-		const req = {} as Request;
+		const req = {
+			query: {},
+		} as unknown as Request;
 		const res = {
+			locals: {
+				pagination: { limit: 10, offset: 0 },
+			},
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -90,6 +120,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "1" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 1 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -109,6 +140,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "99" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 99 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;
@@ -120,27 +152,6 @@ describe("JobRoleController", () => {
 		expect(res.json).toHaveBeenCalledWith({ error: "Job role not found" });
 	});
 
-	it("returns status 400 for invalid id", async () => {
-		const service = {
-			getById: vi.fn(),
-		} as unknown as JobRoleService;
-
-		const controller = new JobRoleController(service);
-		const req = { params: { id: "abc" } } as unknown as Request;
-		const res = {
-			status: vi.fn().mockReturnThis(),
-			json: vi.fn(),
-		} as unknown as Response;
-
-		await controller.getById(req, res);
-
-		expect(service.getById).not.toHaveBeenCalled();
-		expect(res.status).toHaveBeenCalledWith(400);
-		expect(res.json).toHaveBeenCalledWith({
-			error: "Id should be a positive number",
-		});
-	});
-
 	it("returns status 500 when getById throws", async () => {
 		const service = {
 			getById: vi.fn().mockRejectedValue(new Error("DB down")),
@@ -149,6 +160,7 @@ describe("JobRoleController", () => {
 		const controller = new JobRoleController(service);
 		const req = { params: { id: "1" } } as unknown as Request;
 		const res = {
+			locals: { jobRoleId: 1 },
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
 		} as unknown as Response;

@@ -13,3 +13,9 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Prefer targeted tests during iteration.
 - Run full suite before merge.
 - Update only when this category is impacted by a task.
+
+- Date: 2026-08-12
+- Task: Job roles pagination
+- Tests added/updated: `tests/services/jobRoleService.test.ts`, `tests/controllers/jobRoleController.test.ts`, `tests/routes/jobRoleRoute.test.ts`.
+- What was validated: default limit/offset behavior, query param parsing, invalid pagination input handling (400), link generation for first/previous/next/last, `start` alias support.
+- Gaps or follow-up: Frontend list-page link rendering is not in this repository and must be implemented in the UI project.

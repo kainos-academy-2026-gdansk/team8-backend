@@ -6,8 +6,8 @@ const getByIdMock = vi.fn();
 
 vi.mock("../../src/services/jobRoleService", () => {
 	class MockJobRoleService {
-		getAll() {
-			return getAllMock();
+		getAll(pagination: { limit: number; offset: number }) {
+			return getAllMock(pagination);
 		}
 
 		getById(id: number) {
@@ -29,25 +29,95 @@ describe("GET /api/job-roles", () => {
 	});
 
 	it("returns job roles list with status 200", async () => {
-		const mockedResponse = [
-			{
-				id: 1,
-				roleName: "Software Engineer",
-				location: "Gdansk",
-				capability: { id: 1, name: "Engineering" },
-				band: { id: 2, name: "B2" },
-				closingDate: "2026-12-31T00:00:00.000Z",
-				status: { id: 1, name: "OPEN" },
-			},
-		];
+		const mockedResponse = {
+			data: [
+				{
+					id: 1,
+					roleName: "Software Engineer",
+					location: "Gdansk",
+					capability: { id: 1, name: "Engineering" },
+					band: { id: 2, name: "B2" },
+					closingDate: "2026-12-31T00:00:00.000Z",
+					status: { id: 1, name: "OPEN" },
+				},
+			],
+			total: 11,
+			limit: 10,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: true,
+			lastOffset: 10,
+		};
 
 		getAllMock.mockResolvedValueOnce(mockedResponse);
 
 		const response = await request(app).get("/api/job-roles");
 
 		expect(response.status).toBe(200);
-		expect(response.body).toEqual(mockedResponse);
-		expect(getAllMock).toHaveBeenCalledTimes(1);
+		expect(response.body).toEqual({
+			data: mockedResponse.data,
+			total: 11,
+			limit: 10,
+			offset: 0,
+			links: {
+				first: "/api/job-roles?limit=10&offset=0",
+				previous: null,
+				next: "/api/job-roles?limit=10&offset=10",
+				last: "/api/job-roles?limit=10&offset=10",
+			},
+		});
+		expect(getAllMock).toHaveBeenCalledWith({ limit: 10, offset: 0 });
+	});
+
+	it("accepts pagination query params", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 25,
+			limit: 5,
+			offset: 10,
+			hasPrevious: true,
+			hasNext: true,
+			lastOffset: 20,
+		});
+
+		const response = await request(app).get("/api/job-roles?limit=5&offset=10");
+
+		expect(response.status).toBe(200);
+		expect(getAllMock).toHaveBeenCalledWith({ limit: 5, offset: 10 });
+		expect(response.body.links).toEqual({
+			first: "/api/job-roles?limit=5&offset=0",
+			previous: "/api/job-roles?limit=5&offset=5",
+			next: "/api/job-roles?limit=5&offset=15",
+			last: "/api/job-roles?limit=5&offset=20",
+		});
+	});
+
+	it("accepts start query param as alias for offset", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 25,
+			limit: 5,
+			offset: 10,
+			hasPrevious: true,
+			hasNext: true,
+			lastOffset: 20,
+		});
+
+		const response = await request(app).get("/api/job-roles?limit=5&start=10");
+
+		expect(response.status).toBe(200);
+		expect(getAllMock).toHaveBeenCalledWith({ limit: 5, offset: 10 });
+	});
+
+	it("returns status 400 for invalid pagination query params", async () => {
+		const response = await request(app).get("/api/job-roles?limit=0&offset=-1");
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			error:
+				"limit must be a positive integer and offset must be a non-negative integer",
+		});
+		expect(getAllMock).not.toHaveBeenCalled();
 	});
 
 	it("returns status 500 when service fails", async () => {
