@@ -1,12 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
-import type { JobRoleListPagination } from "../services/jobRoleService";
+import type {
+	JobRoleListFilters,
+	JobRoleListPagination,
+} from "../services/jobRoleService";
 import {
 	parseIntegerWithDefault,
+	parseOptionalDate,
+	parseOptionalString,
 	parseRequiredInteger,
+	parseStringList,
 } from "./requestParsers";
 
 type JobRoleListLocals = {
 	pagination: JobRoleListPagination;
+	filters: JobRoleListFilters;
 };
 
 type JobRoleIdLocals = {
@@ -36,6 +43,23 @@ export function validateJobRoleListPagination(
 	}
 
 	res.locals.pagination = { limit, offset };
+	next();
+}
+
+export function parseJobRoleListFilters(
+	req: Request,
+	res: Response<unknown, JobRoleListLocals>,
+	next: NextFunction,
+): void {
+	res.locals.filters = {
+		roleName: parseOptionalString(req.query.roleName),
+		location: parseOptionalString(req.query.location),
+		capabilities: parseStringList(req.query.capability),
+		bands: parseStringList(req.query.band),
+		statuses: parseStringList(req.query.status),
+		closingDateAfter: parseOptionalDate(req.query.closingDateAfter),
+		closingDateBefore: parseOptionalDate(req.query.closingDateBefore),
+	};
 	next();
 }
 

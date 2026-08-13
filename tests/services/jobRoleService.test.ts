@@ -39,9 +39,14 @@ describe("JobRoleService", () => {
 		} as unknown as JobRoleDao;
 
 		const service = new JobRoleService(dao);
-		const result = await service.getAll({ limit: 10, offset: 10 });
+		const result = await service.getAll({
+			pagination: { limit: 10, offset: 10 },
+			filters: {},
+		});
 
-		expect(dao.getAll).toHaveBeenCalledWith(10, 10);
+		expect(dao.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 10 },
+		});
 		expect(dao.countAll).toHaveBeenCalledTimes(1);
 		expect(result).toEqual({
 			data: [
@@ -61,7 +66,81 @@ describe("JobRoleService", () => {
 			hasPrevious: true,
 			hasNext: true,
 			lastOffset: 20,
+			filtered: false,
 		});
+	});
+
+	it("bypasses pagination and returns all matching rows when filters are active", async () => {
+		const daoResult = [createJobRole()];
+
+		const dao = {
+			getAll: vi.fn().mockResolvedValue(daoResult),
+			countAll: vi.fn().mockResolvedValue(25),
+		} as unknown as JobRoleDao;
+
+		const service = new JobRoleService(dao);
+		const result = await service.getAll({
+			pagination: { limit: 10, offset: 10 },
+			filters: { roleName: "engineer" },
+		});
+
+		expect(dao.getAll).toHaveBeenCalledWith({
+			filters: { roleName: "engineer" },
+		});
+		expect(dao.countAll).not.toHaveBeenCalled();
+		expect(result.filtered).toBe(true);
+		expect(result.total).toBe(1);
+		expect(result.data).toHaveLength(1);
+		expect(result.limit).toBe(1);
+		expect(result.offset).toBe(0);
+		expect(result.hasPrevious).toBe(false);
+		expect(result.hasNext).toBe(false);
+		expect(result.lastOffset).toBe(0);
+	});
+
+	it("treats multi-value name filters as active and forwards them to the DAO", async () => {
+		const dao = {
+			getAll: vi.fn().mockResolvedValue([]),
+			countAll: vi.fn().mockResolvedValue(0),
+		} as unknown as JobRoleDao;
+
+		const service = new JobRoleService(dao);
+		const filters = {
+			capabilities: ["Engineering", "Delivery"],
+			bands: ["B2"],
+			statuses: ["OPEN"],
+			closingDateAfter: new Date("2026-01-01T00:00:00.000Z"),
+			closingDateBefore: new Date("2026-12-31T00:00:00.000Z"),
+		};
+		const result = await service.getAll({
+			pagination: { limit: 10, offset: 0 },
+			filters,
+		});
+
+		expect(dao.getAll).toHaveBeenCalledWith({ filters });
+		expect(dao.countAll).not.toHaveBeenCalled();
+		expect(result.filtered).toBe(true);
+		expect(result.total).toBe(0);
+		expect(result.data).toEqual([]);
+	});
+
+	it("ignores empty name-filter arrays and keeps pagination behavior", async () => {
+		const dao = {
+			getAll: vi.fn().mockResolvedValue([]),
+			countAll: vi.fn().mockResolvedValue(0),
+		} as unknown as JobRoleDao;
+
+		const service = new JobRoleService(dao);
+		const result = await service.getAll({
+			pagination: { limit: 10, offset: 0 },
+			filters: { capabilities: [] },
+		});
+
+		expect(dao.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+		});
+		expect(dao.countAll).toHaveBeenCalledTimes(1);
+		expect(result.filtered).toBe(false);
 	});
 
 	it("maps DAO result to JobRoleDetailedResponse for getById", async () => {
@@ -111,10 +190,12 @@ describe("JobRoleService", () => {
 
 		const service = new JobRoleService(dao);
 
-		await expect(service.getAll({ limit: 10, offset: 0 })).rejects.toThrow(
-			"Database error",
-		);
-		expect(dao.getAll).toHaveBeenCalledWith(10, 0);
+		await expect(
+			service.getAll({ pagination: { limit: 10, offset: 0 }, filters: {} }),
+		).rejects.toThrow("Database error");
+		expect(dao.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+		});
 	});
 
 	it("throws when DAO getById fails", async () => {

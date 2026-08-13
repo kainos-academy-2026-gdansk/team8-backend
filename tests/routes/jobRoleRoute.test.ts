@@ -6,8 +6,8 @@ const getByIdMock = vi.fn();
 
 vi.mock("../../src/services/jobRoleService", () => {
 	class MockJobRoleService {
-		getAll(pagination: { limit: number; offset: number }) {
-			return getAllMock(pagination);
+		getAll(params: unknown) {
+			return getAllMock(params);
 		}
 
 		getById(id: number) {
@@ -66,7 +66,10 @@ describe("GET /api/job-roles", () => {
 				last: "/api/job-roles?limit=10&offset=10",
 			},
 		});
-		expect(getAllMock).toHaveBeenCalledWith({ limit: 10, offset: 0 });
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {},
+		});
 	});
 
 	it("accepts pagination query params", async () => {
@@ -83,7 +86,10 @@ describe("GET /api/job-roles", () => {
 		const response = await request(app).get("/api/job-roles?limit=5&offset=10");
 
 		expect(response.status).toBe(200);
-		expect(getAllMock).toHaveBeenCalledWith({ limit: 5, offset: 10 });
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 5, offset: 10 },
+			filters: {},
+		});
 		expect(response.body.links).toEqual({
 			first: "/api/job-roles?limit=5&offset=0",
 			previous: "/api/job-roles?limit=5&offset=5",
@@ -106,7 +112,10 @@ describe("GET /api/job-roles", () => {
 		const response = await request(app).get("/api/job-roles?limit=5&start=10");
 
 		expect(response.status).toBe(200);
-		expect(getAllMock).toHaveBeenCalledWith({ limit: 5, offset: 10 });
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 5, offset: 10 },
+			filters: {},
+		});
 	});
 
 	it("returns status 400 for invalid pagination query params", async () => {
@@ -128,6 +137,186 @@ describe("GET /api/job-roles", () => {
 		expect(response.status).toBe(500);
 		expect(response.body).toEqual({ error: "Failed to fetch job roles" });
 		expect(getAllMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("forwards text filters using case-insensitive contains semantics", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		await request(app).get("/api/job-roles?roleName=engineer&location=gdansk");
+
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: { roleName: "engineer", location: "gdansk" },
+		});
+	});
+
+	it("parses repeated name params into arrays matched by name", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		await request(app).get(
+			"/api/job-roles?capability=Engineering&capability=Delivery&band=B2&status=OPEN",
+		);
+
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {
+				capabilities: ["Engineering", "Delivery"],
+				bands: ["B2"],
+				statuses: ["OPEN"],
+			},
+		});
+	});
+
+	it("treats a single name param as a one-element list", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		await request(app).get("/api/job-roles?capability=Engineering");
+
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: { capabilities: ["Engineering"] },
+		});
+	});
+
+	it("forwards a closing date range", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		await request(app).get(
+			"/api/job-roles?closingDateAfter=2026-01-01&closingDateBefore=2026-12-31",
+		);
+
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {
+				closingDateAfter: new Date("2026-01-01"),
+				closingDateBefore: new Date("2026-12-31"),
+			},
+		});
+	});
+
+	it("silently ignores invalid filter values without returning 400", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: false,
+		});
+
+		const response = await request(app).get(
+			"/api/job-roles?closingDateAfter=not-a-date&roleName=%20%20",
+		);
+
+		expect(response.status).toBe(200);
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {},
+		});
+	});
+
+	it("bypasses pagination and returns all matching rows with null previous/next links", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [
+				{
+					id: 1,
+					roleName: "Software Engineer",
+					location: "Gdansk",
+					capability: { id: 1, name: "Engineering" },
+					band: { id: 2, name: "B2" },
+					closingDate: "2026-12-31T00:00:00.000Z",
+					status: { id: 1, name: "OPEN" },
+				},
+			],
+			total: 1,
+			limit: 1,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		const response = await request(app).get(
+			"/api/job-roles?limit=5&offset=100&capability=Engineering",
+		);
+
+		expect(response.status).toBe(200);
+		expect(response.body.total).toBe(1);
+		expect(response.body.data).toHaveLength(1);
+		expect(response.body.limit).toBe(1);
+		expect(response.body.offset).toBe(0);
+		expect(response.body.links).toEqual({
+			first: "/api/job-roles?limit=1&offset=0",
+			previous: null,
+			next: null,
+			last: "/api/job-roles?limit=1&offset=0",
+		});
+	});
+
+	it("combines multiple filters", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 0,
+			limit: 0,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		});
+
+		await request(app).get(
+			"/api/job-roles?roleName=engineer&capability=Engineering&status=OPEN&closingDateBefore=2026-12-31",
+		);
+
+		expect(getAllMock).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {
+				roleName: "engineer",
+				capabilities: ["Engineering"],
+				statuses: ["OPEN"],
+				closingDateBefore: new Date("2026-12-31"),
+			},
+		});
 	});
 
 	it("returns one job role with status 200", async () => {

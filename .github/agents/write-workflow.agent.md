@@ -1,7 +1,7 @@
 ---
 name: write-workflow-executor
 description: Implements approved backend plans, validates changes, performs local review, and prepares developer handover.
-tools: [read_file, apply_patch, get_errors, runTests, run_in_terminal]
+tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 ---
 
 # Write Workflow Executor Agent

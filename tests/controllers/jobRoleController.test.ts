@@ -48,6 +48,7 @@ describe("JobRoleController", () => {
 		const res = {
 			locals: {
 				pagination: { limit: 10, offset: 0 },
+				filters: {},
 			},
 			status: vi.fn().mockReturnThis(),
 			json: vi.fn(),
@@ -55,7 +56,10 @@ describe("JobRoleController", () => {
 
 		await controller.getAll(req, res);
 
-		expect(service.getAll).toHaveBeenCalledWith({ limit: 10, offset: 0 });
+		expect(service.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: {},
+		});
 		expect(res.status).toHaveBeenCalledWith(200);
 		expect(res.json).toHaveBeenCalledWith({
 			data: jobRoles.data,
@@ -67,6 +71,67 @@ describe("JobRoleController", () => {
 				previous: null,
 				next: "/api/job-roles?limit=10&offset=10",
 				last: "/api/job-roles?limit=10&offset=10",
+			},
+		});
+	});
+
+	it("returns all matching rows with null previous/next links when filtering", async () => {
+		const jobRoles = {
+			data: [
+				{
+					id: 1,
+					roleName: "Software Engineer",
+					location: "Gdansk",
+					capability: { id: 1, name: "Engineering" },
+					band: { id: 2, name: "B2" },
+					closingDate: new Date("2026-12-31T00:00:00.000Z"),
+					status: { id: 1, name: "OPEN" },
+				},
+			],
+			total: 1,
+			limit: 1,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: true,
+		};
+
+		const service = {
+			getAll: vi.fn().mockResolvedValue(jobRoles),
+		} as unknown as JobRoleService;
+
+		const controller = new JobRoleController(service);
+		const req = {
+			query: { roleName: "engineer" },
+			baseUrl: "/api/job-roles",
+		} as unknown as Request;
+		const res = {
+			locals: {
+				pagination: { limit: 10, offset: 0 },
+				filters: { roleName: "engineer" },
+			},
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getAll(req, res);
+
+		expect(service.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 0 },
+			filters: { roleName: "engineer" },
+		});
+		expect(res.status).toHaveBeenCalledWith(200);
+		expect(res.json).toHaveBeenCalledWith({
+			data: jobRoles.data,
+			total: 1,
+			limit: 1,
+			offset: 0,
+			links: {
+				first: "/api/job-roles?limit=1&offset=0",
+				previous: null,
+				next: null,
+				last: "/api/job-roles?limit=1&offset=0",
 			},
 		});
 	});
