@@ -41,12 +41,7 @@ export class AuthController {
 				return;
 			}
 			const token = await this.authService.login(parsed.data);
-			if (!token) {
-				Logger.debug(`Invalid credentials during login`);
-				res.status(401).json({ error: "Invalid credentials" });
-				return;
-			}
-			Logger.debug(`User logged in successfully:`);
+			Logger.debug(`User logged in successfully`);
 			res.status(200).json({ token });
 		} catch (error) {
 			if (error instanceof AuthError) {

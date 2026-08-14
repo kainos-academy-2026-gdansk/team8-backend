@@ -4,6 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getAllMock = vi.fn();
 const getByIdMock = vi.fn();
 
+vi.mock("../../src/middleware/requireAuth", () => ({
+	requireAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
 vi.mock("../../src/services/jobRoleService", () => {
 	class MockJobRoleService {
 		getAll(params: unknown) {

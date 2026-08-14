@@ -28,14 +28,14 @@ export class UserDaoImpl implements UserDao {
 		return { email: user.email, role: fromPrismaUserRole(user.role) };
 	}
 
-	async login(data: LoginRequestDto): Promise<{
+	async login(email: string): Promise<{
 		id: number;
 		email: string;
 		role: string;
 		passwordHash: string;
 	} | null> {
 		const user = await prisma.user.findUnique({
-			where: { email: data.email },
+			where: { email },
 			select: {
 				id: true,
 				email: true,

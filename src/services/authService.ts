@@ -34,10 +34,7 @@ export class AuthService {
 	}
 
 	public async login(input: LoginRequestDto): Promise<string> {
-		const user = await this.userDao.login({
-			email: input.email,
-			password: input.password,
-		});
+		const user = await this.userDao.login(input.email);
 
 		if (!user) {
 			throw new AuthError(401, LOGIN_ERROR);
