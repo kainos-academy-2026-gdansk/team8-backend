@@ -31,9 +31,6 @@ export type RegisterResponseDto = {
 };
 
 export type LoginResponseDto = {
-	id: number;
-	email: string;
-	role: UserRole;
 	token: string;
 };
 
