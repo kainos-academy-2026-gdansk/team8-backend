@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: team8_backend
     ports:
       - "5432:5432"
+    networks:
+      - internal-network
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -28,9 +30,16 @@ services:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@db:5432/team8_backend
+    networks:
+      - internal-network
     ports:
       - "3000:3000"
     restart: unless-stopped
 
 volumes:
   db_data:
+
+networks:
+  internal-network:
+    external: true
+
