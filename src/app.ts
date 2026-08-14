@@ -3,6 +3,7 @@ import morganMiddleware from "./config/morganMiddleware";
 import Logger from "./lib/logger";
 import jobRoleRouter from "./routes/jobRoleRouter";
 import authRouter from "./routes/authRouter";
+import { requireAuth } from "./middleware/requireAuth";
 
 export const app = express();
 
@@ -11,6 +12,7 @@ app.use(morganMiddleware);
 
 app.use("/api/auth", authRouter);
 
+app.use(requireAuth);
 app.use("/api/job-roles", jobRoleRouter);
 
 app.get("/", (_req, res) => {
