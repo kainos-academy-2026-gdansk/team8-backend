@@ -25,3 +25,9 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Tests added/updated: `tests/middleware/requestParsers.test.ts` (new `parseOptionalString`/`parseStringList`/`parseOptionalDate`), `tests/services/jobRoleService.test.ts`, `tests/controllers/jobRoleController.test.ts`, `tests/routes/jobRoleRoute.test.ts`.
 - What was validated: each filter param, repeated vs single name params, case-insensitive text intent, date range, combined filters, invalid values silently ignored (no 400), and pagination bypass returning all rows with null previous/next links.
 - Gaps or follow-up: No DB-integration test for the built Prisma `where` (DAO covered via service/route mocks). Consider a DAO-level test if query shape regresses.
+
+- Date: 2026-08-17
+- Task: US-050 apply for role
+- Tests added/updated: `tests/services/applicationService.test.ts`, `tests/controllers/applicationController.test.ts`, `tests/routes/applicationRoute.test.ts`.
+- What was validated: eligible creation, `IN_PROGRESS` response, closed/zero-position rejection, duplicate rejection, invalid CV body, authenticated route wiring, and route success response. Full suite passed with 12 files and 85 tests.
+- Gaps or follow-up: Prisma migration could not be applied because PostgreSQL was unavailable at `localhost:5432`; run the migration when the database is available.

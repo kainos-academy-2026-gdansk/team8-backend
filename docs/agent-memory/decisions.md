@@ -27,3 +27,10 @@ Use this file for approved technical decisions and their rationale.
 - Rationale: Applicants need complete filtered result sets; lenient parsing keeps the UI resilient to stray query params.
 - Consequences: Filtered responses can be unbounded (accepted at current scale); pagination params are still validated (400) even when ignored due to filtering.
 - Update only when this category is impacted by a task.
+
+- Date: 2026-08-17
+- Task: US-050 apply for role
+- Decision: Applications use `POST /api/job-roles/:id/applications` with `{ cv: string }`. Existing `USER` accounts are applicants; eligible roles require status `OPEN` and more than zero open positions. Applications start at `IN_PROGRESS`, are unique per user/job role, return `409` for ineligible or duplicate submissions, and do not decrement open positions.
+- Alternatives considered: A new applicant role, repeated applications, multipart CV upload, and decrementing positions on submission.
+- Rationale: Matches the approved story baseline while keeping future CV storage changes isolated.
+- Consequences: The frontend must implement the apply and CV pages in its own repository; the backend stores the CV as text until a later migration.
