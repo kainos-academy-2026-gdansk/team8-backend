@@ -21,3 +21,4 @@ ALTER TABLE "Application" ADD CONSTRAINT "Application_userId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_jobRoleId_fkey" FOREIGN KEY ("jobRoleId") REFERENCES "JobRole"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+

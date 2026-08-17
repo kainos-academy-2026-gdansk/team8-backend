@@ -12,7 +12,7 @@ import type { Application } from "../models/Application";
 export class ApplicationError extends Error {
 	constructor(
 		message: string,
-		public readonly statusCode: 404 | 409,
+		public readonly statusCode: 404 | 409 | 423,
 	) {
 		super(message);
 	}
@@ -37,7 +37,7 @@ export class ApplicationService {
 		if (jobRole.status.name !== "OPEN" || jobRole.numberOfOpenPositions <= 0) {
 			throw new ApplicationError(
 				"Job role is not available for applications",
-				409,
+				423,
 			);
 		}
 
