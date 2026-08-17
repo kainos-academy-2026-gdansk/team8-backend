@@ -90,7 +90,7 @@ describe("ApplicationService", () => {
 					{ cv: "encoded-cv" },
 				),
 			).rejects.toEqual(
-				new ApplicationError("Job role is not available for applications", 409),
+				new ApplicationError("Job role is not available for applications", 423),
 			);
 			expect(applicationDao.create).not.toHaveBeenCalled();
 		},
