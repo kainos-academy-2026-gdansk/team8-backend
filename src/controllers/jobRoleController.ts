@@ -6,6 +6,11 @@ import type {
 	JobRoleListLocals,
 } from "../middleware/jobRoleRequestParsers";
 import type { PaginatedJobRoleResponse } from "../dtos/JobRoleDto";
+import type { CreateJobRoleLocals } from "../middleware/jobRoleRequestParsers";
+import {
+	JobRoleInputError,
+	JobRoleNotFoundError,
+} from "../services/jobRoleService";
 
 export class JobRoleController {
 	constructor(private readonly jobRoleService: JobRoleService) {}
@@ -58,6 +63,25 @@ export class JobRoleController {
 		} catch (error) {
 			Logger.error(`Failed to fetch job role: ${String(error)}`);
 			res.status(500).json({ error: "Failed to fetch job role" });
+		}
+	}
+
+	async create(_req: Request, res: Response): Promise<void> {
+		try {
+			const { createJobRole } = res.locals as CreateJobRoleLocals;
+			const jobRole = await this.jobRoleService.create(createJobRole);
+			res.status(201).json(jobRole);
+		} catch (error) {
+			if (error instanceof JobRoleNotFoundError) {
+				res.status(404).json({ error: error.message });
+				return;
+			}
+			if (error instanceof JobRoleInputError) {
+				res.status(500).json({ error: error.message });
+				return;
+			}
+			Logger.error(`Failed to create job role: ${String(error)}`);
+			res.status(500).json({ error: "Failed to create job role" });
 		}
 	}
 }

@@ -4,6 +4,7 @@ import { JobRoleService } from "../services/jobRoleService";
 import { JobRoleDaoImpl } from "../dao/jobRoleDaoImpl";
 import {
 	parseJobRoleListFilters,
+	validateCreateJobRole,
 	validateJobRoleIdParam,
 	validateJobRoleListPagination,
 } from "../middleware/jobRoleRequestParsers";
@@ -18,6 +19,9 @@ router.get(
 	validateJobRoleListPagination,
 	parseJobRoleListFilters,
 	async (_req, res) => controller.getAll(_req, res),
+);
+router.post("/", validateCreateJobRole, async (_req, res) =>
+	controller.create(_req, res),
 );
 router.get("/:id", validateJobRoleIdParam, async (_req, res) =>
 	controller.getById(_req, res),

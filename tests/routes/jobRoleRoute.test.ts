@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const getAllMock = vi.fn();
 const getByIdMock = vi.fn();
+const createMock = vi.fn();
+const catalogueMock = vi.fn();
 
 vi.mock("../../src/middleware/requireAuth", () => ({
 	requireAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
@@ -17,6 +19,10 @@ vi.mock("../../src/services/jobRoleService", () => {
 		getById(id: number) {
 			return getByIdMock(id);
 		}
+
+		create(input: unknown) {
+			return createMock(input);
+		}
 	}
 
 	return {
@@ -24,12 +30,22 @@ vi.mock("../../src/services/jobRoleService", () => {
 	};
 });
 
+vi.mock("../../src/services/catalogueService", () => ({
+	CatalogueService: class {
+		getAll() {
+			return catalogueMock();
+		}
+	},
+}));
+
 import app from "../../src/app";
 
 describe("GET /api/job-roles", () => {
 	beforeEach(() => {
 		getAllMock.mockReset();
 		getByIdMock.mockReset();
+		createMock.mockReset();
+		catalogueMock.mockReset();
 	});
 
 	it("returns job roles list with status 200", async () => {
@@ -373,5 +389,62 @@ describe("GET /api/job-roles", () => {
 		expect(response.status).toBe(500);
 		expect(response.body).toEqual({ error: "Failed to fetch job role" });
 		expect(getByIdMock).toHaveBeenCalledWith(7);
+	});
+
+	it("creates a job role and returns status 201", async () => {
+		const created = {
+			id: 8,
+			roleName: "New Engineer",
+			status: { id: 1, name: "OPEN" },
+		};
+		createMock.mockResolvedValueOnce(created);
+
+		const response = await request(app)
+			.post("/api/job-roles")
+			.send({
+				roleName: "New Engineer",
+				description: "Build APIs",
+				responsibilities: "Design services",
+				sharepointUrl: "https://company.sharepoint.com/new-role",
+				location: "Gdansk",
+				closingDate: "2026-12-31",
+				numberOfOpenPositions: 2,
+				capabilityId: 1,
+				bandId: 2,
+			});
+
+		expect(response.status).toBe(201);
+		expect(response.body).toEqual(created);
+		expect(createMock).toHaveBeenCalledWith({
+			roleName: "New Engineer",
+			description: "Build APIs",
+			responsibilities: "Design services",
+			sharepointUrl: "https://company.sharepoint.com/new-role",
+			location: "Gdansk",
+			closingDate: new Date("2026-12-31T00:00:00.000Z"),
+			numberOfOpenPositions: 2,
+			capabilityId: 1,
+			bandId: 2,
+		});
+	});
+
+	it("rejects invalid create data with status 400", async () => {
+		const response = await request(app).post("/api/job-roles").send({});
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({ error: "Invalid job role data" });
+		expect(createMock).not.toHaveBeenCalled();
+	});
+
+	it("returns approved band and capability catalogues", async () => {
+		catalogueMock.mockResolvedValue([{ id: 1, name: "Cloud" }]);
+
+		const bands = await request(app).get("/api/bands");
+		const capabilities = await request(app).get("/api/capabilities");
+
+		expect(bands.status).toBe(200);
+		expect(bands.body).toEqual([{ id: 1, name: "Cloud" }]);
+		expect(capabilities.status).toBe(200);
+		expect(capabilities.body).toEqual([{ id: 1, name: "Cloud" }]);
 	});
 });

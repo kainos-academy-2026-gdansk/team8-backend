@@ -208,4 +208,41 @@ describe("JobRoleService", () => {
 		await expect(service.getById(1)).rejects.toThrow("Database error");
 		expect(dao.getById).toHaveBeenCalledWith(1);
 	});
+
+	it("creates a job role with the resolved open status", async () => {
+		const dao = {
+			getCapabilityById: vi.fn().mockResolvedValue(true),
+			getBandById: vi.fn().mockResolvedValue(true),
+			getOpenStatusId: vi.fn().mockResolvedValue(7),
+			create: vi.fn().mockResolvedValue(createJobRole()),
+		} as unknown as JobRoleDao;
+		const input = {
+			roleName: "Software Engineer",
+			description: "Role description",
+			responsibilities: "Build APIs",
+			sharepointUrl: "https://company.sharepoint.com/sites/job-specs/se",
+			location: "Gdansk",
+			closingDate: new Date("2026-12-31T00:00:00.000Z"),
+			numberOfOpenPositions: 2,
+			capabilityId: 1,
+			bandId: 2,
+		};
+
+		const result = await new JobRoleService(dao).create(input);
+
+		expect(dao.create).toHaveBeenCalledWith({ ...input, statusId: 7 });
+		expect(result.status.name).toBe("OPEN");
+	});
+
+	it("rejects an unknown capability", async () => {
+		const dao = {
+			getCapabilityById: vi.fn().mockResolvedValue(false),
+			getBandById: vi.fn().mockResolvedValue(true),
+			getOpenStatusId: vi.fn().mockResolvedValue(7),
+		} as unknown as JobRoleDao;
+
+		await expect(new JobRoleService(dao).create({} as never)).rejects.toThrow(
+			"Capability not found",
+		);
+	});
 });

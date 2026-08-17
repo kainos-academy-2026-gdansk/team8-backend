@@ -2,6 +2,18 @@ import type { Band } from "../models/Band";
 import type { Capability } from "../models/Capability";
 import type { Status } from "../models/Status";
 
+export type CreateJobRoleRequest = {
+	roleName: string;
+	description: string;
+	responsibilities: string;
+	sharepointUrl: string;
+	location: string;
+	closingDate: Date;
+	numberOfOpenPositions: number;
+	capabilityId: number;
+	bandId: number;
+};
+
 export type JobRoleResponse = {
 	id: number;
 	roleName: string;
