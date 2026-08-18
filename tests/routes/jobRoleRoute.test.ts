@@ -133,6 +133,81 @@ describe("GET /api/job-roles", () => {
 		expect(getAllMock).not.toHaveBeenCalled();
 	});
 
+	it.each([
+		"roleName",
+		"location",
+		"capability",
+		"band",
+		"closingDate",
+		"status",
+	])("accepts ascending and descending ordering by %s", async (sortBy) => {
+		getAllMock.mockResolvedValue({
+			data: [],
+			total: 0,
+			limit: 10,
+			offset: 0,
+			hasPrevious: false,
+			hasNext: false,
+			lastOffset: 0,
+			filtered: false,
+		});
+
+		for (const direction of ["asc", "desc"] as const) {
+			const response = await request(app).get(
+				`/api/job-roles?sortBy=${sortBy}&sortOrder=${direction}`,
+			);
+
+			expect(response.status).toBe(200);
+			expect(getAllMock).toHaveBeenLastCalledWith({
+				pagination: { limit: 10, offset: 0 },
+				filters: {},
+				ordering: { field: sortBy, direction },
+			});
+		}
+	});
+
+	it.each([
+		"sortBy=id&sortOrder=asc",
+		"sortBy=roleName&sortOrder=sideways",
+		"sortBy=roleName",
+		"sortOrder=asc",
+		"sortBy=roleName&sortBy=location&sortOrder=asc&sortOrder=desc",
+	])("returns status 400 for invalid ordering: %s", async (query) => {
+		const response = await request(app).get(`/api/job-roles?${query}`);
+
+		expect(response.status).toBe(400);
+		expect(response.body).toEqual({
+			error:
+				"sortBy must be one of roleName, location, capability, band, closingDate, status and sortOrder must be asc or desc",
+		});
+		expect(getAllMock).not.toHaveBeenCalled();
+	});
+
+	it("preserves ordering in pagination links", async () => {
+		getAllMock.mockResolvedValueOnce({
+			data: [],
+			total: 25,
+			limit: 5,
+			offset: 10,
+			hasPrevious: true,
+			hasNext: true,
+			lastOffset: 20,
+			filtered: false,
+		});
+
+		const response = await request(app).get(
+			"/api/job-roles?limit=5&offset=10&sortBy=closingDate&sortOrder=asc",
+		);
+
+		expect(response.body.links).toEqual({
+			first: "/api/job-roles?limit=5&offset=0&sortBy=closingDate&sortOrder=asc",
+			previous:
+				"/api/job-roles?limit=5&offset=5&sortBy=closingDate&sortOrder=asc",
+			next: "/api/job-roles?limit=5&offset=15&sortBy=closingDate&sortOrder=asc",
+			last: "/api/job-roles?limit=5&offset=20&sortBy=closingDate&sortOrder=asc",
+		});
+	});
+
 	it("returns status 500 when service fails", async () => {
 		getAllMock.mockRejectedValueOnce(new Error("Database unavailable"));
 

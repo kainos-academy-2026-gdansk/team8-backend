@@ -10,9 +10,23 @@ export type JobRoleListFilters = {
 	closingDateBefore?: Date;
 };
 
+export type JobRoleSortField =
+	| "roleName"
+	| "location"
+	| "capability"
+	| "band"
+	| "closingDate"
+	| "status";
+
+export type JobRoleOrdering = {
+	field: JobRoleSortField;
+	direction: "asc" | "desc";
+};
+
 export type JobRoleListQueryOptions = {
 	pagination?: { limit: number; offset: number };
 	filters?: JobRoleListFilters;
+	ordering?: JobRoleOrdering;
 };
 
 export interface JobRoleDao {

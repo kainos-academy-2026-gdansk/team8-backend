@@ -23,4 +23,10 @@ Use this file for coding and architecture patterns that should be repeated.
 - Pattern: Define list-query filter types in the DAO layer (`jobRoleDao.ts`) and re-export from the service; build the Prisma `where` in a single DAO helper shared by `getAll`/`countAll`. DAO `getAll` takes `{ pagination?, filters? }` so callers omit `take`/`skip` to fetch all rows.
 - Why it works here: Keeps dependency direction routes->controllers->services->dao intact (types flow up via re-export), centralizes `where` construction to avoid filter/count drift, and lets the service toggle pagination bypass without leaking Prisma into upper layers.
 - Example files: `src/dao/jobRoleDao.ts`, `src/dao/jobRoleDaoImpl.ts`, `src/services/jobRoleService.ts`, `src/middleware/requestParsers.ts`
+
+- Date: 2026-08-17
+- Task: US-029 job role ordering
+- Pattern: Parse an allowlisted public ordering object in route middleware, forward it through service list options, and map public scalar/relation keys to Prisma `orderBy` only in the DAO. Preserve active ordering in pagination links.
+- Why it works here: Keeps API validation outside controllers, prevents Prisma field paths leaking into the contract, and orders the full query before pagination.
+- Example files: `src/middleware/jobRoleRequestParsers.ts`, `src/controllers/jobRoleController.ts`, `src/services/jobRoleService.ts`, `src/dao/jobRoleDaoImpl.ts`
 - Update only when this category is impacted by a task.

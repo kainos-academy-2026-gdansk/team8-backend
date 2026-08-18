@@ -25,3 +25,9 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Tests added/updated: `tests/middleware/requestParsers.test.ts` (new `parseOptionalString`/`parseStringList`/`parseOptionalDate`), `tests/services/jobRoleService.test.ts`, `tests/controllers/jobRoleController.test.ts`, `tests/routes/jobRoleRoute.test.ts`.
 - What was validated: each filter param, repeated vs single name params, case-insensitive text intent, date range, combined filters, invalid values silently ignored (no 400), and pagination bypass returning all rows with null previous/next links.
 - Gaps or follow-up: No DB-integration test for the built Prisma `where` (DAO covered via service/route mocks). Consider a DAO-level test if query shape regresses.
+
+- Date: 2026-08-17
+- Task: US-029 job role ordering
+- Tests added/updated: `tests/routes/jobRoleRoute.test.ts`, `tests/services/jobRoleService.test.ts`, `tests/dao/jobRoleDaoImpl.test.ts`.
+- What was validated: all six fields in both directions, omitted/invalid/repeated/incomplete params, pagination-link preservation, filtered and paginated forwarding, scalar/relation/date Prisma clauses, default order, and stable ID tie-breaking.
+- Gaps or follow-up: No live PostgreSQL collation integration test; exact case/locale ordering follows the configured database collation.

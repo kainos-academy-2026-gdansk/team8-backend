@@ -143,6 +143,46 @@ describe("JobRoleService", () => {
 		expect(result.filtered).toBe(false);
 	});
 
+	it("forwards ordering without bypassing pagination", async () => {
+		const dao = {
+			getAll: vi.fn().mockResolvedValue([]),
+			countAll: vi.fn().mockResolvedValue(0),
+		} as unknown as JobRoleDao;
+		const service = new JobRoleService(dao);
+
+		await service.getAll({
+			pagination: { limit: 10, offset: 10 },
+			filters: {},
+			ordering: { field: "roleName", direction: "desc" },
+		});
+
+		expect(dao.getAll).toHaveBeenCalledWith({
+			pagination: { limit: 10, offset: 10 },
+			ordering: { field: "roleName", direction: "desc" },
+		});
+		expect(dao.countAll).toHaveBeenCalledTimes(1);
+	});
+
+	it("forwards ordering when filters bypass pagination", async () => {
+		const dao = {
+			getAll: vi.fn().mockResolvedValue([]),
+			countAll: vi.fn().mockResolvedValue(0),
+		} as unknown as JobRoleDao;
+		const service = new JobRoleService(dao);
+
+		await service.getAll({
+			pagination: { limit: 10, offset: 10 },
+			filters: { location: "Gdansk" },
+			ordering: { field: "capability", direction: "asc" },
+		});
+
+		expect(dao.getAll).toHaveBeenCalledWith({
+			filters: { location: "Gdansk" },
+			ordering: { field: "capability", direction: "asc" },
+		});
+		expect(dao.countAll).not.toHaveBeenCalled();
+	});
+
 	it("maps DAO result to JobRoleDetailedResponse for getById", async () => {
 		const daoResult = createJobRole();
 
