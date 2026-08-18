@@ -1,7 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import type {
 	JobRoleListFilters,
+	JobRoleOrdering,
 	JobRoleListPagination,
+	JobRoleSortField,
 } from "../services/jobRoleService";
 import {
 	parseIntegerWithDefault,
@@ -14,6 +16,7 @@ import {
 type JobRoleListLocals = {
 	pagination: JobRoleListPagination;
 	filters: JobRoleListFilters;
+	ordering?: JobRoleOrdering;
 };
 
 type JobRoleIdLocals = {
@@ -22,6 +25,16 @@ type JobRoleIdLocals = {
 
 const INVALID_PAGINATION_ERROR =
 	"limit must be a positive integer and offset must be a non-negative integer";
+const INVALID_ORDERING_ERROR =
+	"sortBy must be one of roleName, location, capability, band, closingDate, status and sortOrder must be asc or desc";
+const SORT_FIELDS: JobRoleSortField[] = [
+	"roleName",
+	"location",
+	"capability",
+	"band",
+	"closingDate",
+	"status",
+];
 
 export function validateJobRoleListPagination(
 	req: Request,
@@ -59,6 +72,34 @@ export function parseJobRoleListFilters(
 		statuses: parseStringList(req.query.status),
 		closingDateAfter: parseOptionalDate(req.query.closingDateAfter),
 		closingDateBefore: parseOptionalDate(req.query.closingDateBefore),
+	};
+	next();
+}
+
+export function validateJobRoleListOrdering(
+	req: Request,
+	res: Response<unknown, JobRoleListLocals>,
+	next: NextFunction,
+): void {
+	const sortBy = parseOptionalString(req.query.sortBy);
+	const sortOrder = parseOptionalString(req.query.sortOrder);
+
+	if (req.query.sortBy === undefined && req.query.sortOrder === undefined) {
+		next();
+		return;
+	}
+
+	if (
+		!SORT_FIELDS.includes(sortBy as JobRoleSortField) ||
+		(sortOrder !== "asc" && sortOrder !== "desc")
+	) {
+		res.status(400).json({ error: INVALID_ORDERING_ERROR });
+		return;
+	}
+
+	res.locals.ordering = {
+		field: sortBy as JobRoleSortField,
+		direction: sortOrder,
 	};
 	next();
 }

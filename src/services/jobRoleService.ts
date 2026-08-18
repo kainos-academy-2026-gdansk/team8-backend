@@ -1,4 +1,8 @@
-import type { JobRoleDao, JobRoleListFilters } from "../dao/jobRoleDao";
+import type {
+	JobRoleDao,
+	JobRoleListFilters,
+	JobRoleOrdering,
+} from "../dao/jobRoleDao";
 import {
 	mapJobRoleToJobRoleResponses,
 	mapJobRoleToJobRoleDetailedResponse,
@@ -27,6 +31,7 @@ export type JobRoleListResult = {
 export type JobRoleListParams = {
 	pagination: JobRoleListPagination;
 	filters: JobRoleListFilters;
+	ordering?: JobRoleOrdering;
 };
 
 function hasActiveFilters(filters: JobRoleListFilters): boolean {
@@ -45,10 +50,10 @@ export class JobRoleService {
 	constructor(private dao: JobRoleDao) {}
 
 	async getAll(params: JobRoleListParams): Promise<JobRoleListResult> {
-		const { pagination, filters } = params;
+		const { pagination, filters, ordering } = params;
 
 		if (hasActiveFilters(filters)) {
-			const jobRoles = await this.dao.getAll({ filters });
+			const jobRoles = await this.dao.getAll({ filters, ordering });
 			const data = mapJobRoleToJobRoleResponses(jobRoles);
 
 			return {
@@ -66,6 +71,7 @@ export class JobRoleService {
 		const [jobRoles, total] = await Promise.all([
 			this.dao.getAll({
 				pagination: { limit: pagination.limit, offset: pagination.offset },
+				ordering,
 			}),
 			this.dao.countAll(),
 		]);
@@ -93,4 +99,8 @@ export class JobRoleService {
 	}
 }
 
-export type { JobRoleListFilters } from "../dao/jobRoleDao";
+export type {
+	JobRoleListFilters,
+	JobRoleOrdering,
+	JobRoleSortField,
+} from "../dao/jobRoleDao";

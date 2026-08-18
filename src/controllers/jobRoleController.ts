@@ -12,12 +12,27 @@ export class JobRoleController {
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
-			const { pagination, filters } = res.locals as JobRoleListLocals;
-			const result = await this.jobRoleService.getAll({ pagination, filters });
+			const { pagination, filters, ordering } = res.locals as JobRoleListLocals;
+			const result = await this.jobRoleService.getAll({
+				pagination,
+				filters,
+				ordering,
+			});
 			const basePath = req.baseUrl;
 
-			const toLink = (value: number) =>
-				`${basePath}?limit=${result.limit}&offset=${value}`;
+			const toLink = (value: number) => {
+				const params = new URLSearchParams({
+					limit: String(result.limit),
+					offset: String(value),
+				});
+
+				if (ordering) {
+					params.set("sortBy", ordering.field);
+					params.set("sortOrder", ordering.direction);
+				}
+
+				return `${basePath}?${params.toString()}`;
+			};
 
 			const response: PaginatedJobRoleResponse = {
 				data: result.data,

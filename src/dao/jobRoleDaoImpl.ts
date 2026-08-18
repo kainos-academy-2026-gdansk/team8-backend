@@ -6,6 +6,7 @@ import type {
 	JobRoleDao,
 	JobRoleListFilters,
 	JobRoleListQueryOptions,
+	JobRoleOrdering,
 } from "./jobRoleDao";
 
 function buildJobRoleWhere(
@@ -47,6 +48,27 @@ function buildJobRoleWhere(
 	return where;
 }
 
+function buildJobRoleOrderBy(
+	ordering?: JobRoleOrdering,
+): Prisma.JobRoleOrderByWithRelationInput[] {
+	if (!ordering) {
+		return [{ id: "asc" }];
+	}
+
+	const relationOrderBy = {
+		capability: { capability: { name: ordering.direction } },
+		band: { band: { name: ordering.direction } },
+		status: { status: { name: ordering.direction } },
+	} as const;
+
+	const primaryOrder =
+		ordering.field in relationOrderBy
+			? relationOrderBy[ordering.field as keyof typeof relationOrderBy]
+			: { [ordering.field]: ordering.direction };
+
+	return [primaryOrder, { id: "asc" }];
+}
+
 export class JobRoleDaoImpl implements JobRoleDao {
 	async getAll(options: JobRoleListQueryOptions): Promise<JobRole[]> {
 		const jobs = await prisma.jobRole.findMany({
@@ -54,7 +76,7 @@ export class JobRoleDaoImpl implements JobRoleDao {
 			...(options.pagination
 				? { take: options.pagination.limit, skip: options.pagination.offset }
 				: {}),
-			orderBy: { id: "asc" },
+			orderBy: buildJobRoleOrderBy(options.ordering),
 			include: { capability: true, band: true, status: true },
 		});
 

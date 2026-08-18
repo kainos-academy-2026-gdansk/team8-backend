@@ -27,6 +27,10 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Gaps or follow-up: No DB-integration test for the built Prisma `where` (DAO covered via service/route mocks). Consider a DAO-level test if query shape regresses.
 
 - Date: 2026-08-17
+- Task: US-029 job role ordering
+- Tests added/updated: `tests/routes/jobRoleRoute.test.ts`, `tests/services/jobRoleService.test.ts`, `tests/dao/jobRoleDaoImpl.test.ts`.
+- What was validated: all six fields in both directions, omitted/invalid/repeated/incomplete params, pagination-link preservation, filtered and paginated forwarding, scalar/relation/date Prisma clauses, default order, and stable ID tie-breaking.
+- Gaps or follow-up: No live PostgreSQL collation integration test; exact case/locale ordering follows the configured database collation.
 - Task: US-050 apply for role
 - Tests added/updated: `tests/services/applicationService.test.ts`, `tests/controllers/applicationController.test.ts`, `tests/routes/applicationRoute.test.ts`.
 - What was validated: eligible creation, `IN_PROGRESS` response, closed/zero-position rejection, duplicate rejection, invalid CV body, authenticated route wiring, and route success response. Full suite passed with 12 files and 85 tests.
