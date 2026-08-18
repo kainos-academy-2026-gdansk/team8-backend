@@ -8,21 +8,22 @@ datasource db {
 }
 
 model JobRole {
-  id Int @id @default(autoincrement())
-  roleName String
-  description String
-  responsibilities String
-  sharepointUrl String
-  location String
-  capability Capability @relation(fields: [capabilityId], references: [id])
-  capabilityId Int
-  band Band @relation(fields: [bandId], references: [id])
-  bandId Int
-  closingDate DateTime
+  id                    Int           @id @default(autoincrement())
+  roleName              String
+  description           String
+  responsibilities      String
+  sharepointUrl         String
+  location              String
+  capability            Capability    @relation(fields: [capabilityId], references: [id])
+  capabilityId          Int
+  band                  Band          @relation(fields: [bandId], references: [id])
+  bandId                Int
+  closingDate           DateTime
   // status JobRoleStatus
-  status Status @relation(fields: [statusId], references: [id])
-  statusId Int
+  status                Status        @relation(fields: [statusId], references: [id])
+  statusId              Int
   numberOfOpenPositions Int
+  applications          Application[]
 }
 
 // enum JobRoleStatus {
@@ -31,20 +32,20 @@ model JobRole {
 // }
 
 model Capability {
-  id Int @id @default(autoincrement())
-  name String
+  id       Int       @id @default(autoincrement())
+  name     String
   jobRoles JobRole[]
 }
 
 model Band {
-   id Int @id @default(autoincrement())
-   name String
-   jobRoles JobRole[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  jobRoles JobRole[]
 }
 
 model Status {
-  id Int @id @default(autoincrement())
-  name String
+  id       Int       @id @default(autoincrement())
+  name     String
   jobRoles JobRole[]
 }
 
@@ -54,11 +55,29 @@ enum UserRole {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
   passwordHash String
-  role UserRole @default(USER)
-  createdAt DateTime @default(now())
+  role         UserRole      @default(USER)
+  createdAt    DateTime      @default(now())
+  applications Application[]
 }
 
+enum ApplicationStatus {
+  IN_PROGRESS
+  HIRED
+  REJECTED
+}
 
+model Application {
+  id        Int               @id @default(autoincrement())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    Int
+  jobRole   JobRole           @relation(fields: [jobRoleId], references: [id])
+  jobRoleId Int
+  cv        String
+  status    ApplicationStatus @default(IN_PROGRESS)
+  createdAt DateTime          @default(now())
+
+  @@unique([userId, jobRoleId])
+}
