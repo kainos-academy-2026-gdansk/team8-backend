@@ -24,3 +24,9 @@ Use this file for coding and architecture patterns that should be repeated.
 - Why it works here: Keeps dependency direction routes->controllers->services->dao intact (types flow up via re-export), centralizes `where` construction to avoid filter/count drift, and lets the service toggle pagination bypass without leaking Prisma into upper layers.
 - Example files: `src/dao/jobRoleDao.ts`, `src/dao/jobRoleDaoImpl.ts`, `src/services/jobRoleService.ts`, `src/middleware/requestParsers.ts`
 - Update only when this category is impacted by a task.
+
+- Date: 2026-08-18
+- Task: Admin and user views
+- Pattern: Keep shared Nunjucks pages and expose `isAdmin` from session-backed role state for conditional controls; enforce sensitive actions separately with backend middleware.
+- Why it works here: It avoids duplicated views while keeping UI visibility and API authorisation as distinct responsibilities.
+- Example files: `team8-frontend/src/app.ts`, `team8-frontend/src/views/partials/header.njk`, `src/middleware/requireAdmin.ts`

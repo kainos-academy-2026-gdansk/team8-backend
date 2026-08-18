@@ -10,6 +10,10 @@ vi.mock("../../src/middleware/requireAuth", () => ({
 	requireAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
+vi.mock("../../src/middleware/requireAdmin", () => ({
+	requireAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
+}));
+
 vi.mock("../../src/services/jobRoleService", () => {
 	class MockJobRoleService {
 		getAll(params: unknown) {
