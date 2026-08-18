@@ -34,3 +34,10 @@ Use this file for approved technical decisions and their rationale.
 - Rationale: A typed API contract supports UI and direct API consumers while keeping pagination deterministic and database-backed.
 - Consequences: Omitting both parameters retains default `id asc`; pagination links preserve active ordering.
 - Update only when this category is impacted by a task.
+
+- Date: 2026-08-17
+- Task: US-050 apply for role
+- Decision: Applications use `POST /api/job-roles/:id/applications` with `{ cv: string }`. Existing `USER` accounts are applicants; eligible roles require status `OPEN` and more than zero open positions. Applications start at `IN_PROGRESS`, are unique per user/job role, return `409` for ineligible or duplicate submissions, and do not decrement open positions.
+- Alternatives considered: A new applicant role, repeated applications, multipart CV upload, and decrementing positions on submission.
+- Rationale: Matches the approved story baseline while keeping future CV storage changes isolated.
+- Consequences: The frontend must implement the apply and CV pages in its own repository; the backend stores the CV as text until a later migration.

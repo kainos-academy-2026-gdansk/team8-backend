@@ -31,3 +31,7 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Tests added/updated: `tests/routes/jobRoleRoute.test.ts`, `tests/services/jobRoleService.test.ts`, `tests/dao/jobRoleDaoImpl.test.ts`.
 - What was validated: all six fields in both directions, omitted/invalid/repeated/incomplete params, pagination-link preservation, filtered and paginated forwarding, scalar/relation/date Prisma clauses, default order, and stable ID tie-breaking.
 - Gaps or follow-up: No live PostgreSQL collation integration test; exact case/locale ordering follows the configured database collation.
+- Task: US-050 apply for role
+- Tests added/updated: `tests/services/applicationService.test.ts`, `tests/controllers/applicationController.test.ts`, `tests/routes/applicationRoute.test.ts`.
+- What was validated: eligible creation, `IN_PROGRESS` response, closed/zero-position rejection, duplicate rejection, invalid CV body, authenticated route wiring, and route success response. Full suite passed with 12 files and 85 tests.
+- Gaps or follow-up: Prisma migration could not be applied because PostgreSQL was unavailable at `localhost:5432`; run the migration when the database is available.
