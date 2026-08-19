@@ -9,6 +9,11 @@ type AuthLocals = {
 	jobRoleId: number;
 };
 
+type ApplicationDecisionLocals = {
+	jobRoleId: number;
+	applicationId: number;
+};
+
 export class ApplicationController {
 	constructor(private readonly applicationService: ApplicationService) {}
 
@@ -35,6 +40,38 @@ export class ApplicationController {
 
 			Logger.error(`Failed to create application: ${String(error)}`);
 			res.status(500).json({ error: "Failed to create application" });
+		}
+	}
+
+	async hire(_req: Request, res: Response): Promise<void> {
+		try {
+			const { jobRoleId, applicationId } = res.locals as ApplicationDecisionLocals;
+			const application = await this.applicationService.hire(jobRoleId, applicationId);
+			res.status(200).json(application);
+		} catch (error) {
+			if (error instanceof ApplicationError) {
+				res.status(error.statusCode).json({ error: error.message });
+				return;
+			}
+
+			Logger.error(`Failed to hire application: ${String(error)}`);
+			res.status(500).json({ error: "Failed to hire application" });
+		}
+	}
+
+	async reject(_req: Request, res: Response): Promise<void> {
+		try {
+			const { jobRoleId, applicationId } = res.locals as ApplicationDecisionLocals;
+			const application = await this.applicationService.reject(jobRoleId, applicationId);
+			res.status(200).json(application);
+		} catch (error) {
+			if (error instanceof ApplicationError) {
+				res.status(error.statusCode).json({ error: error.message });
+				return;
+			}
+
+			Logger.error(`Failed to reject application: ${String(error)}`);
+			res.status(500).json({ error: "Failed to reject application" });
 		}
 	}
 }

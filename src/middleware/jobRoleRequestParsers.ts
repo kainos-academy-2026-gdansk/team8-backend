@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
+import type { CreateJobRoleRequest } from "../dtos/JobRoleDto";
 import type {
 	JobRoleListFilters,
-	JobRoleOrdering,
 	JobRoleListPagination,
+	JobRoleOrdering,
 	JobRoleSortField,
 } from "../services/jobRoleService";
-import type { CreateJobRoleRequest } from "../dtos/JobRoleDto";
 import {
 	parseIntegerWithDefault,
 	parseOptionalDate,
@@ -23,6 +23,12 @@ type JobRoleListLocals = {
 type JobRoleIdLocals = {
 	jobRoleId: number;
 };
+
+type ApplicationIdLocals = {
+	applicationId: number;
+};
+
+type GenericIdLocals = JobRoleIdLocals & Partial<ApplicationIdLocals>;
 
 type CreateJobRoleLocals = {
 	createJobRole: CreateJobRoleRequest;
@@ -109,19 +115,22 @@ export function validateJobRoleListOrdering(
 	next();
 }
 
-export function validateJobRoleIdParam(
+export function validateIdParam(
 	req: Request,
-	res: Response<unknown, JobRoleIdLocals>,
+	res: Response,
 	next: NextFunction,
+	paramName: "id" | "jobRoleId" | "applicationId",
+	localName: "jobRoleId" | "applicationId",
 ): void {
-	const id = parseRequiredInteger(req.params.id, { min: 1 });
+	const rawId = req.params[paramName];
+	const id = parseRequiredInteger(rawId, { min: 1 });
 
 	if (id === null) {
 		res.status(400).json({ error: "Id should be a positive number" });
 		return;
 	}
 
-	res.locals.jobRoleId = id;
+	res.locals[localName] = id;
 	next();
 }
 
@@ -139,9 +148,12 @@ export function validateCreateJobRole(
 	const capabilityId = parseRequiredInteger(body.capabilityId, { min: 1 });
 	const bandId = parseRequiredInteger(body.bandId, { min: 1 });
 	const closingDate = parseOptionalDate(body.closingDate);
-	const numberOfOpenPositions = parseRequiredInteger(body.numberOfOpenPositions, {
-		min: 0,
-	});
+	const numberOfOpenPositions = parseRequiredInteger(
+		body.numberOfOpenPositions,
+		{
+			min: 0,
+		},
+	);
 
 	if (
 		!roleName ||
@@ -179,4 +191,10 @@ export function validateCreateJobRole(
 	next();
 }
 
-export type { JobRoleListLocals, JobRoleIdLocals, CreateJobRoleLocals };
+export type {
+	ApplicationIdLocals,
+	CreateJobRoleLocals,
+	GenericIdLocals,
+	JobRoleIdLocals,
+	JobRoleListLocals,
+};

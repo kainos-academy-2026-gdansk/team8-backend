@@ -41,3 +41,10 @@ Use this file for approved technical decisions and their rationale.
 - Alternatives considered: A new applicant role, repeated applications, multipart CV upload, and decrementing positions on submission.
 - Rationale: Matches the approved story baseline while keeping future CV storage changes isolated.
 - Consequences: The frontend must implement the apply and CV pages in its own repository; the backend stores the CV as text until a later migration.
+
+- Date: 2026-08-19
+- Task: US-051 admin application review and hiring decisions
+- Decision: Admins can fetch a role detail response with embedded `applications` data using the applicant email as the public username label, and can transition `IN_PROGRESS` applications via `PATCH /api/job-roles/:jobRoleId/applications/:applicationId/hire` and `/reject`.
+- Alternatives considered: exposing applicant lists to all authenticated users or performing non-atomic status/position updates.
+- Rationale: Recruitment admins need a safe review workflow without leaking CV data to regular users; the backend must guard stale state and concurrent hire attempts.
+- Consequences: Only queried admins receive `applications` on the role-detail response, while non-admin requests keep the existing payload. Hire decrements one open position and sets `HIRED`; reject sets `REJECTED` without changing positions.
