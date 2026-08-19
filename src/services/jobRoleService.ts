@@ -11,6 +11,10 @@ import type {
 	JobRoleDetailedResponse,
 	JobRoleResponse,
 } from "../dtos/JobRoleDto";
+import type { CreateJobRoleRequest } from "../dtos/JobRoleDto";
+
+export class JobRoleInputError extends Error {}
+export class JobRoleNotFoundError extends Error {}
 
 export type JobRoleListPagination = {
 	limit: number;
@@ -96,6 +100,27 @@ export class JobRoleService {
 	async getById(id: number): Promise<JobRoleDetailedResponse | null> {
 		const jobRole = await this.dao.getById(id);
 		return jobRole ? mapJobRoleToJobRoleDetailedResponse(jobRole) : null;
+	}
+
+	async create(input: CreateJobRoleRequest): Promise<JobRoleDetailedResponse> {
+		const [capabilityExists, bandExists, statusId] = await Promise.all([
+			this.dao.getCapabilityById(input.capabilityId),
+			this.dao.getBandById(input.bandId),
+			this.dao.getOpenStatusId(),
+		]);
+
+		if (!capabilityExists) {
+			throw new JobRoleNotFoundError("Capability not found");
+		}
+		if (!bandExists) {
+			throw new JobRoleNotFoundError("Band not found");
+		}
+		if (statusId === null) {
+			throw new JobRoleInputError("Open status is not configured");
+		}
+
+		const jobRole = await this.dao.create({ ...input, statusId });
+		return mapJobRoleToJobRoleDetailedResponse(jobRole);
 	}
 }
 

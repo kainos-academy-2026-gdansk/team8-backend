@@ -5,8 +5,10 @@ import { ApplicationDaoImpl } from "../dao/applicationDaoImpl";
 import { JobRoleService } from "../services/jobRoleService";
 import { ApplicationService } from "../services/applicationService";
 import { JobRoleDaoImpl } from "../dao/jobRoleDaoImpl";
+import { requireAdmin } from "../middleware/requireAdmin";
 import {
 	parseJobRoleListFilters,
+	validateCreateJobRole,
 	validateJobRoleIdParam,
 	validateJobRoleListOrdering,
 	validateJobRoleListPagination,
@@ -26,6 +28,9 @@ router.get(
 	parseJobRoleListFilters,
 	validateJobRoleListOrdering,
 	async (_req, res) => controller.getAll(_req, res),
+);
+router.post("/", requireAdmin, validateCreateJobRole, async (_req, res) =>
+	controller.create(_req, res),
 );
 router.get("/:id", validateJobRoleIdParam, async (_req, res) =>
 	controller.getById(_req, res),

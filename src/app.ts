@@ -4,6 +4,7 @@ import Logger from "./lib/logger";
 import jobRoleRouter from "./routes/jobRoleRouter";
 import authRouter from "./routes/authRouter";
 import { requireAuth } from "./middleware/requireAuth";
+import catalogueRouter from "./routes/catalogueRouter";
 
 export const app = express();
 
@@ -23,6 +24,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", authRouter);
 
 app.use(requireAuth);
+app.use("/api", catalogueRouter);
 app.use("/api/job-roles", jobRoleRouter);
 
 export default app;

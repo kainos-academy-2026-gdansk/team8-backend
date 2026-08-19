@@ -1,4 +1,5 @@
 import "dotenv/config";
+import argon2 from "argon2";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
@@ -184,6 +185,17 @@ async function main() {
 
 	await prisma.status.createMany({
 		data: statusNames.map((name) => ({ name })),
+	});
+
+	const adminPasswordHash = await argon2.hash("#Admin123");
+	await prisma.user.upsert({
+		where: { email: "admin@admin.com" },
+		update: { passwordHash: adminPasswordHash, role: "ADMIN" },
+		create: {
+			email: "admin@admin.com",
+			passwordHash: adminPasswordHash,
+			role: "ADMIN",
+		},
 	});
 
 	const [capabilities, bands, statuses] = await Promise.all([

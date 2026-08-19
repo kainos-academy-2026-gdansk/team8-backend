@@ -8,6 +8,7 @@ import type {
 	JobRoleListQueryOptions,
 	JobRoleOrdering,
 } from "./jobRoleDao";
+import type { CreateJobRoleRequest } from "../dtos/JobRoleDto";
 
 function buildJobRoleWhere(
 	filters?: JobRoleListFilters,
@@ -94,5 +95,40 @@ export class JobRoleDaoImpl implements JobRoleDao {
 		});
 
 		return job ? mapPrismaJobRoleToJobRole(job) : null;
+	}
+
+	async getCapabilityById(id: number): Promise<boolean> {
+		return (await prisma.capability.findUnique({ where: { id }, select: { id: true } })) !== null;
+	}
+
+	async getBandById(id: number): Promise<boolean> {
+		return (await prisma.band.findUnique({ where: { id }, select: { id: true } })) !== null;
+	}
+
+	async getOpenStatusId(): Promise<number | null> {
+		const status = await prisma.status.findFirst({
+			where: { name: { equals: "OPEN", mode: "insensitive" } },
+			select: { id: true },
+		});
+		return status?.id ?? null;
+	}
+
+	async create(input: CreateJobRoleRequest & { statusId: number }): Promise<JobRole> {
+		const job = await prisma.jobRole.create({
+			data: {
+				roleName: input.roleName,
+				description: input.description,
+				responsibilities: input.responsibilities,
+				sharepointUrl: input.sharepointUrl,
+				location: input.location,
+				closingDate: input.closingDate,
+				numberOfOpenPositions: input.numberOfOpenPositions,
+				capabilityId: input.capabilityId,
+				bandId: input.bandId,
+				statusId: input.statusId,
+			},
+			include: { capability: true, band: true, status: true },
+		});
+		return mapPrismaJobRoleToJobRole(job);
 	}
 }

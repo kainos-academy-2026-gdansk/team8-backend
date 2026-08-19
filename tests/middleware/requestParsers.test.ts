@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
 	parseIntegerWithDefault,
 	parseOptionalDate,
@@ -6,6 +6,7 @@ import {
 	parseRequiredInteger,
 	parseStringList,
 } from "../../src/middleware/requestParsers";
+import { validateCreateJobRole } from "../../src/middleware/jobRoleRequestParsers";
 
 describe("parseIntegerWithDefault", () => {
 	it("returns default value when param is undefined", () => {
@@ -123,5 +124,50 @@ describe("parseOptionalDate", () => {
 
 	it("returns undefined for empty strings", () => {
 		expect(parseOptionalDate("   ")).toBeUndefined();
+	});
+});
+
+describe("validateCreateJobRole", () => {
+	const validBody = {
+		roleName: "Software Engineer",
+		description: "Build APIs",
+		responsibilities: "Design and maintain services",
+		sharepointUrl: "https://company.sharepoint.com/role",
+		location: "Gdansk",
+		closingDate: "2026-12-31",
+		numberOfOpenPositions: "2",
+		capabilityId: "1",
+		bandId: "2",
+	};
+
+	it("normalizes a valid request body", () => {
+		const res = { locals: {}, status: () => res, json: () => res } as never;
+		const next = () => undefined;
+
+		validateCreateJobRole({ body: validBody } as never, res, next);
+
+		expect(res.locals.createJobRole).toEqual({
+			...validBody,
+			closingDate: new Date("2026-12-31T00:00:00.000Z"),
+			numberOfOpenPositions: 2,
+			capabilityId: 1,
+			bandId: 2,
+		});
+	});
+
+	it("rejects missing required fields and malformed values", () => {
+		const status = vi.fn().mockReturnThis();
+		const json = vi.fn();
+		const next = vi.fn();
+
+		validateCreateJobRole(
+			{ body: { ...validBody, description: "", sharepointUrl: "invalid" } } as never,
+			{ locals: {}, status, json } as never,
+			next,
+		);
+
+		expect(status).toHaveBeenCalledWith(400);
+		expect(json).toHaveBeenCalledWith({ error: "Invalid job role data" });
+		expect(next).not.toHaveBeenCalled();
 	});
 });

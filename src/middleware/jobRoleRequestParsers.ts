@@ -5,6 +5,7 @@ import type {
 	JobRoleListPagination,
 	JobRoleSortField,
 } from "../services/jobRoleService";
+import type { CreateJobRoleRequest } from "../dtos/JobRoleDto";
 import {
 	parseIntegerWithDefault,
 	parseOptionalDate,
@@ -21,6 +22,10 @@ type JobRoleListLocals = {
 
 type JobRoleIdLocals = {
 	jobRoleId: number;
+};
+
+type CreateJobRoleLocals = {
+	createJobRole: CreateJobRoleRequest;
 };
 
 const INVALID_PAGINATION_ERROR =
@@ -120,4 +125,58 @@ export function validateJobRoleIdParam(
 	next();
 }
 
-export type { JobRoleListLocals, JobRoleIdLocals };
+export function validateCreateJobRole(
+	req: Request,
+	res: Response<unknown, CreateJobRoleLocals>,
+	next: NextFunction,
+): void {
+	const body = req.body as Record<string, unknown>;
+	const roleName = parseOptionalString(body.roleName);
+	const description = parseOptionalString(body.description);
+	const responsibilities = parseOptionalString(body.responsibilities);
+	const sharepointUrl = parseOptionalString(body.sharepointUrl);
+	const location = parseOptionalString(body.location);
+	const capabilityId = parseRequiredInteger(body.capabilityId, { min: 1 });
+	const bandId = parseRequiredInteger(body.bandId, { min: 1 });
+	const closingDate = parseOptionalDate(body.closingDate);
+	const numberOfOpenPositions = parseRequiredInteger(body.numberOfOpenPositions, {
+		min: 0,
+	});
+
+	if (
+		!roleName ||
+		!description ||
+		!responsibilities ||
+		!sharepointUrl ||
+		!location ||
+		capabilityId === null ||
+		bandId === null ||
+		closingDate === undefined ||
+		numberOfOpenPositions === null
+	) {
+		res.status(400).json({ error: "Invalid job role data" });
+		return;
+	}
+
+	try {
+		new URL(sharepointUrl);
+	} catch {
+		res.status(400).json({ error: "Invalid job role data" });
+		return;
+	}
+
+	res.locals.createJobRole = {
+		roleName,
+		description,
+		responsibilities,
+		sharepointUrl,
+		location,
+		closingDate,
+		numberOfOpenPositions,
+		capabilityId,
+		bandId,
+	};
+	next();
+}
+
+export type { JobRoleListLocals, JobRoleIdLocals, CreateJobRoleLocals };

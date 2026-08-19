@@ -14,6 +14,12 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Run full suite before merge.
 - Update only when this category is impacted by a task.
 
+- Date: 2026-08-18
+- Task: Admin and user views
+- Tests added/updated: `tests/middleware/requireAuth.test.ts`, `tests/middleware/requireAdmin.test.ts`, `tests/routes/jobRoleRoute.test.ts`, and frontend `tests/authApiService.test.ts`/`tests/index.test.ts`.
+- What was validated: valid role propagation, missing-role rejection, Admin-only API guard, Admin/User header visibility, and full backend regression suite.
+- Gaps or follow-up: Backend build needs the declared `@types/jsonwebtoken` dependency installed in the local environment; frontend lint still reports existing generated `dist` warnings.
+
 - Date: 2026-08-12
 - Task: Job roles pagination
 - Tests added/updated: `tests/services/jobRoleService.test.ts`, `tests/controllers/jobRoleController.test.ts`, `tests/routes/jobRoleRoute.test.ts`.
