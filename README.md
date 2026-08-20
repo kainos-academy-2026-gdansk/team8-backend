@@ -92,6 +92,9 @@ npm run test:integration
 The test uses a unique email and removes that user during teardown. Run it against
 a dedicated test database when running tests in parallel or in CI.
 
+GitHub Actions starts PostgreSQL, applies migrations, and runs this integration test
+after the unit tests with `npm run test:integration -- --reporter=line`.
+
 ## Lint The API
 
 - Lint:

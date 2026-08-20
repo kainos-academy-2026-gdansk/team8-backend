@@ -7,13 +7,16 @@ import app from "../../src/app";
 import prisma from "../../src/prismaClient";
 
 const testEmail = `playwright-registration-${randomUUID()}@example.com`;
-let server: Server;
-let apiContext: Awaited<ReturnType<typeof playwrightRequest.newContext>>;
+let server: Server | undefined;
+let apiContext:
+	| Awaited<ReturnType<typeof playwrightRequest.newContext>>
+	| undefined;
 
 test.beforeAll(async () => {
 	await prisma.$queryRaw`SELECT 1`;
-	server = createServer(app);
-	await new Promise<void>((resolve) => server.listen(0, resolve));
+	const startedServer = createServer(app);
+	server = startedServer;
+	await new Promise<void>((resolve) => startedServer.listen(0, resolve));
 
 	const address = server.address();
 	if (!address || typeof address === "string") {
@@ -27,14 +30,22 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
 	await apiContext?.dispose();
-	await new Promise<void>((resolve, reject) => {
-		server.close((error) => (error ? reject(error) : resolve()));
-	});
-	await prisma.user.deleteMany({ where: { email: testEmail } });
-	await prisma.$disconnect();
+	if (server?.listening) {
+		await new Promise<void>((resolve, reject) => {
+			server?.close((error) => (error ? reject(error) : resolve()));
+		});
+	}
+	try {
+		await prisma.user.deleteMany({ where: { email: testEmail } });
+	} finally {
+		await prisma.$disconnect();
+	}
 });
 
 test("registers a user and persists a hashed password", async () => {
+	if (!apiContext) {
+		throw new Error("Playwright API context was not initialized");
+	}
 	const password = "StrongPass!1";
 	const response = await apiContext.post("/api/auth/register", {
 		data: {
