@@ -92,9 +92,7 @@ export class ApplicationDaoImpl implements ApplicationDao {
 			}
 
 			if (application.status !== ApplicationStatus.IN_PROGRESS) {
-				throw new ApplicationConflictError(
-					"Application is not in progress",
-				);
+				throw new ApplicationConflictError("Application is not in progress");
 			}
 
 			const jobRole = await tx.jobRole.findUnique({
@@ -137,9 +135,7 @@ export class ApplicationDaoImpl implements ApplicationDao {
 		}
 
 		if (application.status !== ApplicationStatus.IN_PROGRESS) {
-			throw new ApplicationConflictError(
-				"Application is not in progress",
-			);
+			throw new ApplicationConflictError("Application is not in progress");
 		}
 
 		const updatedApplication = await prisma.application.update({

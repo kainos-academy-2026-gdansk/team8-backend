@@ -478,19 +478,17 @@ describe("GET /api/job-roles", () => {
 		};
 		createMock.mockResolvedValueOnce(created);
 
-		const response = await request(app)
-			.post("/api/job-roles")
-			.send({
-				roleName: "New Engineer",
-				description: "Build APIs",
-				responsibilities: "Design services",
-				sharepointUrl: "https://company.sharepoint.com/new-role",
-				location: "Gdansk",
-				closingDate: "2026-12-31",
-				numberOfOpenPositions: 2,
-				capabilityId: 1,
-				bandId: 2,
-			});
+		const response = await request(app).post("/api/job-roles").send({
+			roleName: "New Engineer",
+			description: "Build APIs",
+			responsibilities: "Design services",
+			sharepointUrl: "https://company.sharepoint.com/new-role",
+			location: "Gdansk",
+			closingDate: "2026-12-31",
+			numberOfOpenPositions: 2,
+			capabilityId: 1,
+			bandId: 2,
+		});
 
 		expect(response.status).toBe(201);
 		expect(response.body).toEqual(created);

@@ -84,7 +84,8 @@ export class JobRoleController {
 				this.applicationService &&
 				res.locals.authUser?.role === UserRole.ADMIN
 			) {
-				const applications = await this.applicationService.getApplicationsByJobRole(id);
+				const applications =
+					await this.applicationService.getApplicationsByJobRole(id);
 				res.status(200).json({ ...jobRole, applications });
 				return;
 			}

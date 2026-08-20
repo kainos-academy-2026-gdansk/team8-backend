@@ -26,7 +26,7 @@ describe("requireAdmin", () => {
 
 		requireAdmin({} as never, response as never, () => {
 			nextCalled = true;
-	});
+		});
 
 		expect(nextCalled).toBe(true);
 		expect(response.statusCode).toBe(0);
@@ -38,7 +38,7 @@ describe("requireAdmin", () => {
 
 		requireAdmin({} as never, response as never, () => {
 			nextCalled = true;
-	});
+		});
 
 		expect(nextCalled).toBe(false);
 		expect(response.statusCode).toBe(403);

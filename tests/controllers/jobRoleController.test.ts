@@ -227,7 +227,10 @@ describe("JobRoleController", () => {
 			]),
 		};
 
-		const controller = new JobRoleController(service, applicationService as never);
+		const controller = new JobRoleController(
+			service,
+			applicationService as never,
+		);
 		const req = { params: { id: "1" } } as unknown as Request;
 		const res = {
 			locals: { jobRoleId: 1, authUser: { role: "ADMIN" } },

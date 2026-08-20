@@ -100,14 +100,20 @@ export class ApplicationService {
 		};
 	}
 
-	async hire(jobRoleId: number, applicationId: number): Promise<ApplicationResponseDto> {
+	async hire(
+		jobRoleId: number,
+		applicationId: number,
+	): Promise<ApplicationResponseDto> {
 		const jobRole = await this.jobRoleDao.getById(jobRoleId);
 		if (!jobRole) {
 			throw new ApplicationError("Job role not found", 404);
 		}
 
 		try {
-			const application = await this.applicationDao.hire(jobRoleId, applicationId);
+			const application = await this.applicationDao.hire(
+				jobRoleId,
+				applicationId,
+			);
 			return {
 				id: application.id,
 				jobRoleId: application.jobRoleId,
@@ -125,14 +131,20 @@ export class ApplicationService {
 		}
 	}
 
-	async reject(jobRoleId: number, applicationId: number): Promise<ApplicationResponseDto> {
+	async reject(
+		jobRoleId: number,
+		applicationId: number,
+	): Promise<ApplicationResponseDto> {
 		const jobRole = await this.jobRoleDao.getById(jobRoleId);
 		if (!jobRole) {
 			throw new ApplicationError("Job role not found", 404);
 		}
 
 		try {
-			const application = await this.applicationDao.reject(jobRoleId, applicationId);
+			const application = await this.applicationDao.reject(
+				jobRoleId,
+				applicationId,
+			);
 			return {
 				id: application.id,
 				jobRoleId: application.jobRoleId,

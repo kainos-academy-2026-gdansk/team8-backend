@@ -161,7 +161,9 @@ describe("validateCreateJobRole", () => {
 		const next = vi.fn();
 
 		validateCreateJobRole(
-			{ body: { ...validBody, description: "", sharepointUrl: "invalid" } } as never,
+			{
+				body: { ...validBody, description: "", sharepointUrl: "invalid" },
+			} as never,
 			{ locals: {}, status, json } as never,
 			next,
 		);

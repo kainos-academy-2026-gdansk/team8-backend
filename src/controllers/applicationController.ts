@@ -45,8 +45,12 @@ export class ApplicationController {
 
 	async hire(_req: Request, res: Response): Promise<void> {
 		try {
-			const { jobRoleId, applicationId } = res.locals as ApplicationDecisionLocals;
-			const application = await this.applicationService.hire(jobRoleId, applicationId);
+			const { jobRoleId, applicationId } =
+				res.locals as ApplicationDecisionLocals;
+			const application = await this.applicationService.hire(
+				jobRoleId,
+				applicationId,
+			);
 			res.status(200).json(application);
 		} catch (error) {
 			if (error instanceof ApplicationError) {
@@ -61,8 +65,12 @@ export class ApplicationController {
 
 	async reject(_req: Request, res: Response): Promise<void> {
 		try {
-			const { jobRoleId, applicationId } = res.locals as ApplicationDecisionLocals;
-			const application = await this.applicationService.reject(jobRoleId, applicationId);
+			const { jobRoleId, applicationId } =
+				res.locals as ApplicationDecisionLocals;
+			const application = await this.applicationService.reject(
+				jobRoleId,
+				applicationId,
+			);
 			res.status(200).json(application);
 		} catch (error) {
 			if (error instanceof ApplicationError) {

@@ -63,7 +63,12 @@ describe("ApplicationService", () => {
 			getById: vi.fn().mockResolvedValue(createJobRole()),
 		} as unknown as JobRoleDao;
 
-		await expect(new ApplicationService(applicationDao, jobRoleDao).getApplicationsByJobRole(1)).resolves.toEqual([
+		await expect(
+			new ApplicationService(
+				applicationDao,
+				jobRoleDao,
+			).getApplicationsByJobRole(1),
+		).resolves.toEqual([
 			{
 				id: 1,
 				jobRoleId: 1,
@@ -100,16 +105,18 @@ describe("ApplicationService", () => {
 
 	it("hiring an in-progress application decrements positions and marks the application as hired", async () => {
 		const applicationDao = {
-			hire: vi.fn().mockResolvedValue(
-				new Application(
-					1,
-					10,
-					1,
-					"encoded-cv",
-					"HIRED",
-					new Date("2026-08-17T00:00:00.000Z"),
+			hire: vi
+				.fn()
+				.mockResolvedValue(
+					new Application(
+						1,
+						10,
+						1,
+						"encoded-cv",
+						"HIRED",
+						new Date("2026-08-17T00:00:00.000Z"),
+					),
 				),
-			),
 		} as unknown as ApplicationDao;
 		const jobRoleDao = {
 			getById: vi.fn().mockResolvedValue(createJobRole("OPEN", 2)),
@@ -127,16 +134,18 @@ describe("ApplicationService", () => {
 
 	it("rejecting an in-progress application marks it rejected without changing the role", async () => {
 		const applicationDao = {
-			reject: vi.fn().mockResolvedValue(
-				new Application(
-					1,
-					10,
-					1,
-					"encoded-cv",
-					"REJECTED",
-					new Date("2026-08-17T00:00:00.000Z"),
+			reject: vi
+				.fn()
+				.mockResolvedValue(
+					new Application(
+						1,
+						10,
+						1,
+						"encoded-cv",
+						"REJECTED",
+						new Date("2026-08-17T00:00:00.000Z"),
+					),
 				),
-			),
 		} as unknown as ApplicationDao;
 		const jobRoleDao = {
 			getById: vi.fn().mockResolvedValue(createJobRole("OPEN", 2)),

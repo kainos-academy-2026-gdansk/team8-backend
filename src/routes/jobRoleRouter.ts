@@ -33,19 +33,20 @@ router.get(
 router.post("/", requireAdmin, validateCreateJobRole, async (_req, res) =>
 	controller.create(_req, res),
 );
-router.get("/:id", (req, res, next) =>
-	validateIdParam(req, res, next, "id", "jobRoleId"),
+router.get(
+	"/:id",
+	(req, res, next) => validateIdParam(req, res, next, "id", "jobRoleId"),
 	async (_req, res) => controller.getById(_req, res),
 );
-router.post("/:id/applications", (req, res, next) =>
-	validateIdParam(req, res, next, "id", "jobRoleId"),
+router.post(
+	"/:id/applications",
+	(req, res, next) => validateIdParam(req, res, next, "id", "jobRoleId"),
 	async (_req, res) => applicationController.create(_req, res),
 );
 router.patch(
 	"/:jobRoleId/applications/:applicationId/hire",
 	requireAdmin,
-	(req, res, next) =>
-		validateIdParam(req, res, next, "jobRoleId", "jobRoleId"),
+	(req, res, next) => validateIdParam(req, res, next, "jobRoleId", "jobRoleId"),
 	(req, res, next) =>
 		validateIdParam(req, res, next, "applicationId", "applicationId"),
 	async (_req, res) => applicationController.hire(_req, res),
@@ -53,8 +54,7 @@ router.patch(
 router.patch(
 	"/:jobRoleId/applications/:applicationId/reject",
 	requireAdmin,
-	(req, res, next) =>
-		validateIdParam(req, res, next, "jobRoleId", "jobRoleId"),
+	(req, res, next) => validateIdParam(req, res, next, "jobRoleId", "jobRoleId"),
 	(req, res, next) =>
 		validateIdParam(req, res, next, "applicationId", "applicationId"),
 	async (_req, res) => applicationController.reject(_req, res),
