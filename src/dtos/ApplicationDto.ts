@@ -19,3 +19,12 @@ export type ApplicationResponseDto = {
 	status: ApplicationStatus;
 	createdAt: Date;
 };
+
+export type ApplicationSummaryDto = {
+	id: number;
+	jobRoleId: number;
+	applicantEmail: string;
+	cv: string;
+	status: ApplicationStatus;
+	createdAt: Date;
+};

@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import Logger from "../lib/logger";
+import type { ApplicationService } from "../services/applicationService";
 import type { JobRoleService } from "../services/jobRoleService";
 import type {
 	JobRoleIdLocals,
@@ -7,13 +8,17 @@ import type {
 } from "../middleware/jobRoleRequestParsers";
 import type { PaginatedJobRoleResponse } from "../dtos/JobRoleDto";
 import type { CreateJobRoleLocals } from "../middleware/jobRoleRequestParsers";
+import { UserRole } from "../models/UserRole";
 import {
 	JobRoleInputError,
 	JobRoleNotFoundError,
 } from "../services/jobRoleService";
 
 export class JobRoleController {
-	constructor(private readonly jobRoleService: JobRoleService) {}
+	constructor(
+		private readonly jobRoleService: JobRoleService,
+		private readonly applicationService?: ApplicationService,
+	) {}
 
 	async getAll(req: Request, res: Response): Promise<void> {
 		try {
@@ -72,10 +77,25 @@ export class JobRoleController {
 
 			if (!jobRole) {
 				res.status(404).json({ error: "Job role not found" });
-			} else {
-				res.status(200).json(jobRole);
+				return;
 			}
+
+			if (
+				this.applicationService &&
+				res.locals.authUser?.role === UserRole.ADMIN
+			) {
+				const applications =
+					await this.applicationService.getApplicationsByJobRole(id);
+				res.status(200).json({ ...jobRole, applications });
+				return;
+			}
+
+			res.status(200).json(jobRole);
 		} catch (error) {
+			if (error instanceof Error && error.message === "Job role not found") {
+				res.status(404).json({ error: error.message });
+				return;
+			}
 			Logger.error(`Failed to fetch job role: ${String(error)}`);
 			res.status(500).json({ error: "Failed to fetch job role" });
 		}

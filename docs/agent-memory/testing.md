@@ -20,6 +20,12 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - What was validated: valid role propagation, missing-role rejection, Admin-only API guard, Admin/User header visibility, and full backend regression suite.
 - Gaps or follow-up: Backend build needs the declared `@types/jsonwebtoken` dependency installed in the local environment; frontend lint still reports existing generated `dist` warnings.
 
+- Date: 2026-08-19
+- Task: US-051 admin application review and hiring decisions
+- Tests added/updated: `tests/services/applicationService.test.ts`, `tests/controllers/jobRoleController.test.ts`, and route/controller coverage for admin role-detail enrichment and hire/reject actions.
+- What was validated: admin-only `applications` data in job-role detail response, successful hire/reject transitions, stale-state conflict handling, missing-role/application rejection, and full backend regression suite.
+- Gaps or follow-up: `npm run lint` is still blocked by generated coverage CSS warnings in `coverage/base.css`, which are not part of the app source and should be excluded from repo linting if this becomes a regular issue.
+
 - Date: 2026-08-12
 - Task: Job roles pagination
 - Tests added/updated: `tests/services/jobRoleService.test.ts`, `tests/controllers/jobRoleController.test.ts`, `tests/routes/jobRoleRoute.test.ts`.

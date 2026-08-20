@@ -197,6 +197,65 @@ describe("JobRoleController", () => {
 		expect(res.json).toHaveBeenCalledWith(jobRole);
 	});
 
+	it("adds applicant data when the requester is an admin", async () => {
+		const jobRole = {
+			id: 1,
+			roleName: "Software Engineer",
+			description: "Role description",
+			responsibilities: "Build APIs",
+			sharepointUrl: "https://company.sharepoint.com/sites/job-specs/se",
+			location: "Gdansk",
+			capability: { id: 1, name: "Engineering" },
+			band: { id: 2, name: "B2" },
+			closingDate: new Date("2026-12-31T00:00:00.000Z"),
+			status: { id: 1, name: "OPEN" },
+			numberOfOpenPositions: 2,
+		};
+		const service = {
+			getById: vi.fn().mockResolvedValue(jobRole),
+		} as unknown as JobRoleService;
+		const applicationService = {
+			getApplicationsByJobRole: vi.fn().mockResolvedValue([
+				{
+					id: 3,
+					jobRoleId: 1,
+					applicantEmail: "applicant@example.com",
+					cv: "encoded-cv",
+					status: "IN_PROGRESS",
+					createdAt: new Date("2026-08-17T00:00:00.000Z"),
+				},
+			]),
+		};
+
+		const controller = new JobRoleController(
+			service,
+			applicationService as never,
+		);
+		const req = { params: { id: "1" } } as unknown as Request;
+		const res = {
+			locals: { jobRoleId: 1, authUser: { role: "ADMIN" } },
+			status: vi.fn().mockReturnThis(),
+			json: vi.fn(),
+		} as unknown as Response;
+
+		await controller.getById(req, res);
+
+		expect(applicationService.getApplicationsByJobRole).toHaveBeenCalledWith(1);
+		expect(res.json).toHaveBeenCalledWith({
+			...jobRole,
+			applications: [
+				{
+					id: 3,
+					jobRoleId: 1,
+					applicantEmail: "applicant@example.com",
+					cv: "encoded-cv",
+					status: "IN_PROGRESS",
+					createdAt: new Date("2026-08-17T00:00:00.000Z"),
+				},
+			],
+		});
+	});
+
 	it("returns status 404 when getById returns null", async () => {
 		const service = {
 			getById: vi.fn().mockResolvedValue(null),

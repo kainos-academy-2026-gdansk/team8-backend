@@ -1,10 +1,13 @@
 import {
+	ApplicationConflictError,
+	ApplicationNotFoundError,
 	DuplicateApplicationError,
 	type ApplicationDao,
 } from "../dao/applicationDao";
 import type { JobRoleDao } from "../dao/jobRoleDao";
 import type {
 	ApplicationResponseDto,
+	ApplicationSummaryDto,
 	CreateApplicationRequestDto,
 } from "../dtos/ApplicationDto";
 import type { Application } from "../models/Application";
@@ -23,6 +26,25 @@ export class ApplicationService {
 		private readonly applicationDao: ApplicationDao,
 		private readonly jobRoleDao: JobRoleDao,
 	) {}
+
+	async getApplicationsByJobRole(
+		jobRoleId: number,
+	): Promise<ApplicationSummaryDto[]> {
+		const jobRole = await this.jobRoleDao.getById(jobRoleId);
+		if (!jobRole) {
+			throw new ApplicationError("Job role not found", 404);
+		}
+
+		const applications = await this.applicationDao.getByJobRole(jobRoleId);
+		return applications.map((application) => ({
+			id: application.id,
+			jobRoleId: application.jobRoleId,
+			applicantEmail: application.applicantEmail,
+			cv: application.cv,
+			status: application.status,
+			createdAt: application.createdAt,
+		}));
+	}
 
 	async createApplication(
 		userId: number,
@@ -76,5 +98,67 @@ export class ApplicationService {
 			status: application.status,
 			createdAt: application.createdAt,
 		};
+	}
+
+	async hire(
+		jobRoleId: number,
+		applicationId: number,
+	): Promise<ApplicationResponseDto> {
+		const jobRole = await this.jobRoleDao.getById(jobRoleId);
+		if (!jobRole) {
+			throw new ApplicationError("Job role not found", 404);
+		}
+
+		try {
+			const application = await this.applicationDao.hire(
+				jobRoleId,
+				applicationId,
+			);
+			return {
+				id: application.id,
+				jobRoleId: application.jobRoleId,
+				status: application.status,
+				createdAt: application.createdAt,
+			};
+		} catch (error) {
+			if (error instanceof ApplicationNotFoundError) {
+				throw new ApplicationError("Application not found", 404);
+			}
+			if (error instanceof ApplicationConflictError) {
+				throw new ApplicationError(error.message, 409);
+			}
+			throw error;
+		}
+	}
+
+	async reject(
+		jobRoleId: number,
+		applicationId: number,
+	): Promise<ApplicationResponseDto> {
+		const jobRole = await this.jobRoleDao.getById(jobRoleId);
+		if (!jobRole) {
+			throw new ApplicationError("Job role not found", 404);
+		}
+
+		try {
+			const application = await this.applicationDao.reject(
+				jobRoleId,
+				applicationId,
+			);
+			return {
+				id: application.id,
+				jobRoleId: application.jobRoleId,
+				status: application.status,
+				createdAt: application.createdAt,
+			};
+		} catch (error) {
+			if (error instanceof ApplicationNotFoundError) {
+				throw new ApplicationError("Application not found", 404);
+			}
+			if (error instanceof ApplicationConflictError) {
+				throw new ApplicationError(error.message, 409);
+			}
+			throw error;
+		}
 	}
 }

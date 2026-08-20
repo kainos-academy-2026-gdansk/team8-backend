@@ -98,11 +98,21 @@ export class JobRoleDaoImpl implements JobRoleDao {
 	}
 
 	async getCapabilityById(id: number): Promise<boolean> {
-		return (await prisma.capability.findUnique({ where: { id }, select: { id: true } })) !== null;
+		return (
+			(await prisma.capability.findUnique({
+				where: { id },
+				select: { id: true },
+			})) !== null
+		);
 	}
 
 	async getBandById(id: number): Promise<boolean> {
-		return (await prisma.band.findUnique({ where: { id }, select: { id: true } })) !== null;
+		return (
+			(await prisma.band.findUnique({
+				where: { id },
+				select: { id: true },
+			})) !== null
+		);
 	}
 
 	async getOpenStatusId(): Promise<number | null> {
@@ -113,7 +123,9 @@ export class JobRoleDaoImpl implements JobRoleDao {
 		return status?.id ?? null;
 	}
 
-	async create(input: CreateJobRoleRequest & { statusId: number }): Promise<JobRole> {
+	async create(
+		input: CreateJobRoleRequest & { statusId: number },
+	): Promise<JobRole> {
 		const job = await prisma.jobRole.create({
 			data: {
 				roleName: input.roleName,
