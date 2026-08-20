@@ -24,7 +24,14 @@
 		"lint:fix": "biome lint --write .",
 		"lint:format": "biome format --write .",
 		"test": "vitest run",
-		"test:coverage": "vitest run --coverage"
+		"test:coverage": "vitest run --coverage",
+		"test:bdd": "bddgen && playwright test",
+		"test:bdd:mocked": "bddgen && playwright test --project=api-mocked",
+		"test:bdd:integration": "bddgen && playwright test --project=api-integration",
+		"test:bdd:keep-db": "BDD_KEEP_DB=1 npm run test:bdd",
+		"db:test:up": "docker compose -f docker-compose.test.yml up -d --wait",
+		"db:test:prepare": "if [ \"$BDD_EXTERNAL_DB\" != \"1\" ]; then npm run db:test:up; fi; npx prisma migrate deploy",
+		"db:test:down": "docker compose -f docker-compose.test.yml down -v"
 	},
 	"repository": {
 		"type": "git",
@@ -38,6 +45,7 @@
 	"homepage": "https://github.com/kainos-academy-2026-gdansk/team8-backend#readme",
 	"devDependencies": {
 		"@biomejs/biome": "2.5.7",
+		"@playwright/test": "^1.62.1",
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.19.0",
 		"@types/jsonwebtoken": "^9.0.10",
@@ -46,6 +54,7 @@
 		"@types/pg": "^8.20.4",
 		"@types/supertest": "^7.2.1",
 		"@vitest/coverage-v8": "^4.1.10",
+		"playwright-bdd": "^9.2.0",
 		"prisma": "^7.9.1",
 		"supertest": "^7.2.2",
 		"tsx": "^4.23.5",

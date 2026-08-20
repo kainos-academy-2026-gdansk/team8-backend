@@ -15,3 +15,7 @@ logs/
 code_reviews/
 certs/*
 !certs/.gitkeep
+
+tests/bdd/.features-gen/
+test-results/
+playwright-report/

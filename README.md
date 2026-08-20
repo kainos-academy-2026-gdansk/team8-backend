@@ -78,6 +78,27 @@ npm test
 npm run test:coverage
 ```
 
+## BDD Tests
+
+Gherkin scenarios live in `tests/bdd/features` and run through playwright-bdd against two harnesses:
+
+- `api-mocked` uses in-memory DAOs and needs no database.
+- `api-integration` uses the real Prisma DAOs against a throwaway Postgres container on port 5433.
+
+```bash
+npm run test:bdd              # both projects
+npm run test:bdd:mocked       # no Docker required
+npm run test:bdd:integration  # real Postgres
+```
+
+The integration project starts the container, applies migrations, and removes the container when the run finishes.
+
+Environment flags:
+
+- `BDD_KEEP_DB=1` keeps the test container running after the run, for faster reruns or inspecting data. Also available as `npm run test:bdd:keep-db`. Tear it down later with `npm run db:test:down`.
+- `BDD_EXTERNAL_DB=1` skips container management entirely, for CI where the database is provided as a service.
+- `TEST_DATABASE_URL` overrides the test connection string.
+
 ## Lint The API
 
 - Lint:
