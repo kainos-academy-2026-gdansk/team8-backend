@@ -143,7 +143,7 @@ export class ApplicationDaoImpl implements ApplicationDao {
 		}
 
 		const updatedApplication = await prisma.application.update({
-			where: { id: applicationId },
+			where: { id: applicationId, status: ApplicationStatus.IN_PROGRESS },
 			data: { status: ApplicationStatus.REJECTED },
 		});
 

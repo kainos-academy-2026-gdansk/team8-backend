@@ -3,11 +3,7 @@ import type { Application } from "../models/Application";
 
 export class DuplicateApplicationError extends Error {}
 
-export class ApplicationConflictError extends Error {
-	constructor(message: string) {
-		super(message);
-	}
-}
+export class ApplicationConflictError extends Error {}
 
 export class ApplicationNotFoundError extends Error {}
 
