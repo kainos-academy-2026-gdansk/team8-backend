@@ -78,6 +78,20 @@ npm test
 npm run test:coverage
 ```
 
+### Registration Integration Test
+
+The registration integration test uses Playwright's API request client against the
+Express app and verifies the persisted user in PostgreSQL. It requires a local
+PostgreSQL database configured through `DATABASE_URL` with all migrations applied.
+
+```bash
+npx prisma migrate deploy
+npm run test:integration
+```
+
+The test uses a unique email and removes that user during teardown. Run it against
+a dedicated test database when running tests in parallel or in CI.
+
 ## Lint The API
 
 - Lint:
