@@ -24,6 +24,7 @@
 		"lint:fix": "biome lint --write .",
 		"lint:format": "biome format --write .",
 		"test": "vitest run",
+		"test:integration": "playwright test",
 		"test:coverage": "vitest run --coverage"
 	},
 	"repository": {
@@ -38,6 +39,7 @@
 	"homepage": "https://github.com/kainos-academy-2026-gdansk/team8-backend#readme",
 	"devDependencies": {
 		"@biomejs/biome": "2.5.7",
+		"@playwright/test": "^1.62.1",
 		"@types/express": "^5.0.6",
 		"@types/express-session": "^1.19.0",
 		"@types/jsonwebtoken": "^9.0.10",

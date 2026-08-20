@@ -3,6 +3,8 @@ dist/
 .env
 coverage/
 .ai/
+playwright-report/
+test-results/
 
 /src/generated/prisma
 
