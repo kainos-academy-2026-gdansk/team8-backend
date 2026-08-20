@@ -22,7 +22,8 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm test
-
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
   docker:
     runs-on: ubuntu-latest
     needs: test
