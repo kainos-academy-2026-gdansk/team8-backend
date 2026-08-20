@@ -97,7 +97,7 @@ Environment flags:
 
 - `BDD_KEEP_DB=1` keeps the test container running after the run, for faster reruns or inspecting data. Also available as `npm run test:bdd:keep-db`. Tear it down later with `npm run db:test:down`.
 - `BDD_EXTERNAL_DB=1` skips container management entirely, for CI where the database is provided as a service.
-- `TEST_DATABASE_URL` overrides the test connection string.
+- `TEST_DATABASE_URL` overrides the test connection string. The database name must end with `_test` — the harness truncates every table and refuses to start otherwise.
 
 ## Lint The API
 

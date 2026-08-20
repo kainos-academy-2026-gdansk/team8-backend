@@ -53,7 +53,8 @@ export default defineConfig({
 			command:
 				"npm run db:test:prepare && tsx tests/bdd/support/integrationServer.ts",
 			url: `${integrationURL}/health`,
-			reuseExistingServer: !process.env.CI,
+			// Never reuse: a stale harness would skip provisioning and point at a removed container.
+			reuseExistingServer: false,
 			timeout: 180_000,
 			env: {
 				BDD_PORT: String(integrationPort),

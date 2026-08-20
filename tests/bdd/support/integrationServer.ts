@@ -7,6 +7,9 @@ import { requireAuth } from "../../../src/middleware/requireAuth";
 import prisma from "../../../src/prismaClient";
 import { ApplicationService } from "../../../src/services/applicationService";
 import type { ScenarioState } from "./scenarioState";
+import { assertTestDatabase } from "./testDatabase";
+
+assertTestDatabase();
 
 const controller = new ApplicationController(
 	new ApplicationService(new ApplicationDaoImpl(), new JobRoleDaoImpl()),
