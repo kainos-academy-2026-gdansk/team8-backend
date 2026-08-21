@@ -11,9 +11,11 @@ let server: Server | undefined;
 let apiContext:
 	| Awaited<ReturnType<typeof playwrightRequest.newContext>>
 	| undefined;
+let databaseConnected = false;
 
 test.beforeAll(async () => {
 	await prisma.$queryRaw`SELECT 1`;
+	databaseConnected = true;
 	const startedServer = createServer(app);
 	server = startedServer;
 	await new Promise<void>((resolve) => startedServer.listen(0, resolve));
@@ -35,11 +37,10 @@ test.afterAll(async () => {
 			server?.close((error) => (error ? reject(error) : resolve()));
 		});
 	}
-	try {
+	if (databaseConnected) {
 		await prisma.user.deleteMany({ where: { email: testEmail } });
-	} finally {
-		await prisma.$disconnect();
 	}
+	await prisma.$disconnect();
 });
 
 test("registers a user and persists a hashed password", async () => {
