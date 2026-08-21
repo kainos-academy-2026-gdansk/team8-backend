@@ -31,16 +31,22 @@ test.beforeAll(async () => {
 });
 
 test.afterAll(async () => {
-	await apiContext?.dispose();
-	if (server?.listening) {
-		await new Promise<void>((resolve, reject) => {
-			server?.close((error) => (error ? reject(error) : resolve()));
-		});
-	}
-	if (databaseConnected) {
-		await prisma.user.deleteMany({ where: { email: testEmail } });
-	}
-	await prisma.$disconnect();
+  await apiContext?.dispose();
+  if (server?.listening) {
+    await new Promise<void>((resolve, reject) => {
+      server?.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+  if (databaseConnected) {
+    try {
+      await prisma.user.deleteMany({ where: { email: testEmail } });
+    } catch (error) {
+      console.error("Cleanup error (non-fatal):", error);
+    }
+  }
+  if (databaseConnected) {
+    await prisma.$disconnect();
+  }
 });
 
 test("registers a user and persists a hashed password", async () => {
