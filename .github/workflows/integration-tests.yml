@@ -1,0 +1,28 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5433/team8_backend_test
+      TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5433/team8_backend_test
+      BDD_EXTERNAL_DB: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run test:integration -- --reporter=line

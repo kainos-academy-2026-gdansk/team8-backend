@@ -7,7 +7,7 @@ import type {
 	ScenarioState,
 } from "./support/scenarioState";
 
-export const JWT_SECRET = process.env.JWT_SECRET ?? "bdd-test-secret";
+export const JWT_SECRET = "bdd-test-secret";
 
 export class ApplyWorld {
 	jobRoles: JobRoleSeed[] = [];

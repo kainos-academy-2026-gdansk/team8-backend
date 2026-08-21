@@ -1,11 +1,11 @@
 import express, { Router } from "express";
-import { ApplicationController } from "../../../src/controllers/applicationController";
-import { ApplicationDaoImpl } from "../../../src/dao/applicationDaoImpl";
-import { JobRoleDaoImpl } from "../../../src/dao/jobRoleDaoImpl";
-import { validateJobRoleIdParam } from "../../../src/middleware/jobRoleRequestParsers";
-import { requireAuth } from "../../../src/middleware/requireAuth";
-import prisma from "../../../src/prismaClient";
-import { ApplicationService } from "../../../src/services/applicationService";
+import { ApplicationController } from "../../../../src/controllers/applicationController";
+import { ApplicationDaoImpl } from "../../../../src/dao/applicationDaoImpl";
+import { JobRoleDaoImpl } from "../../../../src/dao/jobRoleDaoImpl";
+import { validateJobRoleIdParam } from "../../../../src/middleware/jobRoleRequestParsers";
+import { requireAuth } from "../../../../src/middleware/requireAuth";
+import prisma from "../../../../src/prismaClient";
+import { ApplicationService } from "../../../../src/services/applicationService";
 import type { ScenarioState } from "./scenarioState";
 import { assertTestDatabase } from "./testDatabase";
 

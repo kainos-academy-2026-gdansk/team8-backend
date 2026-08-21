@@ -80,7 +80,7 @@ npm run test:coverage
 
 ## BDD Tests
 
-Gherkin scenarios live in `tests/bdd/features` and run through playwright-bdd against two harnesses:
+Gherkin scenarios live in `tests/integrations/bdd/features` and run through playwright-bdd against two harnesses:
 
 - `api-mocked` uses in-memory DAOs and needs no database.
 - `api-integration` uses the real Prisma DAOs against a throwaway Postgres container on port 5433.
@@ -89,6 +89,7 @@ Gherkin scenarios live in `tests/bdd/features` and run through playwright-bdd ag
 npm run test:bdd              # both projects
 npm run test:bdd:mocked       # no Docker required
 npm run test:bdd:integration  # real Postgres
+npm run test:integration      # apply-for-role BDD and registration tests
 ```
 
 The integration project starts the container, applies migrations, and removes the container when the run finishes.
@@ -98,6 +99,8 @@ Environment flags:
 - `BDD_KEEP_DB=1` keeps the test container running after the run, for faster reruns or inspecting data. Also available as `npm run test:bdd:keep-db`. Tear it down later with `npm run db:test:down`.
 - `BDD_EXTERNAL_DB=1` skips container management entirely, for CI where the database is provided as a service.
 - `TEST_DATABASE_URL` overrides the test connection string. The database name must end with `_test` — the harness truncates every table and refuses to start otherwise.
+
+The registration integration test is `tests/integrations/register.spec.ts`. It starts the Express app on an ephemeral port, calls the real registration endpoint, and verifies the persisted Argon2 password hash. It uses the same test database as the BDD integration project.
 
 ## Lint The API
 

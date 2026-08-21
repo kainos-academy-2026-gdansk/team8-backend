@@ -43,6 +43,13 @@ Use this file for testing strategy lessons and recurring test setup patterns.
 - Tests added/updated: `tests/routes/jobRoleRoute.test.ts`, `tests/services/jobRoleService.test.ts`, `tests/dao/jobRoleDaoImpl.test.ts`.
 - What was validated: all six fields in both directions, omitted/invalid/repeated/incomplete params, pagination-link preservation, filtered and paginated forwarding, scalar/relation/date Prisma clauses, default order, and stable ID tie-breaking.
 - Gaps or follow-up: No live PostgreSQL collation integration test; exact case/locale ordering follows the configured database collation.
+
+- Date: 2026-08-21
+- Task: Shared Playwright integration test directory
+- Tests added/updated: Moved apply-for-role BDD tests to `tests/integrations/bdd` and added `tests/integrations/register.spec.ts`; added a combined `test:integration` command and CI workflow.
+- What was validated: BDD generation and Playwright discovery find 9 apply-for-role scenarios plus the registration persistence test; Biome and TypeScript checks pass.
+- What was validated after environment alignment: Full execution passed locally with Docker and PostgreSQL on test port 5433; all 10 Playwright integration tests passed serially.
+
 - Task: US-050 apply for role
 - Tests added/updated: `tests/services/applicationService.test.ts`, `tests/controllers/applicationController.test.ts`, `tests/routes/applicationRoute.test.ts`.
 - What was validated: eligible creation, `IN_PROGRESS` response, closed/zero-position rejection, duplicate rejection, invalid CV body, authenticated route wiring, and route success response. Full suite passed with 12 files and 85 tests.
