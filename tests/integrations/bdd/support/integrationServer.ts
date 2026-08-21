@@ -2,7 +2,7 @@ import express, { Router } from "express";
 import { ApplicationController } from "../../../../src/controllers/applicationController";
 import { ApplicationDaoImpl } from "../../../../src/dao/applicationDaoImpl";
 import { JobRoleDaoImpl } from "../../../../src/dao/jobRoleDaoImpl";
-import { validateJobRoleIdParam } from "../../../../src/middleware/jobRoleRequestParsers";
+import { validateIdParam } from "../../../../src/middleware/jobRoleRequestParsers";
 import { requireAuth } from "../../../../src/middleware/requireAuth";
 import prisma from "../../../../src/prismaClient";
 import { ApplicationService } from "../../../../src/services/applicationService";
@@ -16,8 +16,10 @@ const controller = new ApplicationController(
 );
 
 const jobRoleRouter = Router();
-jobRoleRouter.post("/:id/applications", validateJobRoleIdParam, (req, res) =>
-	controller.create(req, res),
+jobRoleRouter.post(
+	"/:id/applications",
+	(req, res, next) => validateIdParam(req, res, next, "id", "jobRoleId"),
+	(req, res) => controller.create(req, res),
 );
 
 async function resetAndSeed(state: ScenarioState): Promise<void> {

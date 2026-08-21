@@ -5,7 +5,7 @@ import {
 	DuplicateApplicationError,
 } from "../../../../src/dao/applicationDao";
 import type { JobRoleDao } from "../../../../src/dao/jobRoleDao";
-import { validateJobRoleIdParam } from "../../../../src/middleware/jobRoleRequestParsers";
+import { validateIdParam } from "../../../../src/middleware/jobRoleRequestParsers";
 import { requireAuth } from "../../../../src/middleware/requireAuth";
 import { Application } from "../../../../src/models/Application";
 import { Band } from "../../../../src/models/Band";
@@ -91,8 +91,10 @@ const controller = new ApplicationController(
 );
 
 const jobRoleRouter = Router();
-jobRoleRouter.post("/:id/applications", validateJobRoleIdParam, (req, res) =>
-	controller.create(req, res),
+jobRoleRouter.post(
+	"/:id/applications",
+	(req, res, next) => validateIdParam(req, res, next, "id", "jobRoleId"),
+	(req, res) => controller.create(req, res),
 );
 
 export function createTestServer() {

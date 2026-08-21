@@ -134,6 +134,14 @@ export function validateIdParam(
 	next();
 }
 
+export function validateJobRoleIdParam(
+	req: Request,
+	res: Response<unknown, JobRoleIdLocals>,
+	next: NextFunction,
+): void {
+	validateIdParam(req, res, next, "id", "jobRoleId");
+}
+
 export function validateCreateJobRole(
 	req: Request,
 	res: Response<unknown, CreateJobRoleLocals>,
