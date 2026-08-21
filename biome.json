@@ -1,5 +1,8 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
+	"files": {
+		"includes": ["**", "!**/tests/integrations/bdd/.features-gen"]
+	},
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab"

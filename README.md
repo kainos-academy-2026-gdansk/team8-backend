@@ -66,16 +66,59 @@ npm start
 
 ## Test The API
 
-- Run tests once:
+### Unit & Service Tests (Vitest)
+
+Unit tests for controllers, services, DAOs, and utilities using Vitest. These are fast and don't require a database.
 
 ```bash
-npm test
+npm test                    # Run all unit tests once
+npm run test:coverage       # Run unit tests with coverage report
 ```
 
-- Run tests with coverage:
+### BDD Integration Tests (Playwright)
+
+Behavior-driven tests for applying to job roles and user registration using Playwright and Gherkin feature files.
+
+**Two test harnesses available:**
+
+- **`api-mocked`** — Uses in-memory DAOs; fast, no database required
+- **`api-integration`** — Uses real Prisma DAOs against ephemeral PostgreSQL on port 5433; verifies real database behavior
 
 ```bash
-npm run test:coverage
+npm run test:bdd              # Run both mocked and integration BDD tests
+npm run test:bdd:mocked       # Mocked harness only (fastest, no Docker)
+npm run test:bdd:integration  # Integration harness only (requires Docker)
+npm run test:integration      # apply-for-role BDD tests + user registration test
+npm run test:bdd:keep-db      # Integration tests with database persisted for debugging
+```
+
+**Test files:**
+
+- Feature files: `tests/integrations/bdd/features/*.feature` (Gherkin scenarios)
+- Step definitions: `tests/integrations/bdd/steps/*.ts` (test logic)
+- Registration test: `tests/integrations/register.spec.ts` (Argon2 password hash verification)
+
+**Environment flags:**
+
+| Flag | Effect | Use case |
+|------|--------|----------|
+| `BDD_KEEP_DB=1` | Keep test database running after tests | Faster reruns, manual inspection |
+| `BDD_EXTERNAL_DB=1` | Skip container management | CI environments with provided services |
+| `TEST_DATABASE_URL` | Override test connection string | Custom test database URL (must end with `_test`) |
+
+**Database lifecycle:**
+
+- Integration tests auto-provision a throwaway Postgres container on port 5433
+- Database is ephemeral (tmpfs); rebuilt from migrations on every run
+- Container is destroyed after tests unless `BDD_KEEP_DB=1` or `BDD_EXTERNAL_DB=1` are set
+- Use `npm run db:test:down` to manually clean up kept containers
+
+### Test Database Management
+
+```bash
+npm run db:test:up          # Start test database container (port 5433)
+npm run db:test:prepare     # Start container and apply migrations
+npm run db:test:down        # Stop and remove test database container
 ```
 
 ## Lint The API

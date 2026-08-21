@@ -1,0 +1,18 @@
+services:
+  test-db:
+    image: postgres:16-alpine
+    container_name: team8-backend-test-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: team8_backend_test
+    ports:
+      - "5433:5432"
+    # Ephemeral storage: the test database is rebuilt from migrations on every run.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d team8_backend_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
