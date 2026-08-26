@@ -105,4 +105,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
+
+  cd:
+    needs: containerize
+    uses: ./.github/workflows/cd.yml
+    secrets: inherit
  
