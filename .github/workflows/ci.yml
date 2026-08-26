@@ -112,5 +112,8 @@ jobs:
 
   cd:
     needs: containerize
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/cd.yml
     secrets: inherit
