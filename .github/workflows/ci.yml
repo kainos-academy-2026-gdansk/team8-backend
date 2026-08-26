@@ -6,11 +6,12 @@ on:
   pull_request:
     branches: [main, master]
 
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
+
 jobs:
   lint:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
     permissions:
       contents: read
 
@@ -38,8 +39,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
     steps:
       - name: Checkout
@@ -65,8 +64,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
     steps:
       - name: Checkout
