@@ -65,6 +65,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
     steps:
       - name: Checkout
