@@ -20,10 +20,7 @@ const colors = {
 
 winston.addColors(colors);
 
-const level = () => {
-	const env = process.env.NODE_ENV || "development";
-	return env === "development" ? "debug" : "warn";
-};
+const level = () => process.env.LOG_LEVEL || "debug";
 
 const fileFormat = winston.format.combine(
 	winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" }),
