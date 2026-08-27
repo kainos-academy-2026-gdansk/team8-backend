@@ -52,3 +52,4 @@ jobs:
           tags: |
             ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.commit_tag }}
             ${{ steps.tags.outputs.image }}:latest
+            
