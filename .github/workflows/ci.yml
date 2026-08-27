@@ -4,15 +4,16 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
+
+permissions:
+  contents: read
+
+env:
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout
@@ -36,10 +37,6 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
     steps:
       - name: Checkout
@@ -63,10 +60,6 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/team8_backend_ci
 
     steps:
       - name: Checkout
@@ -90,8 +83,6 @@ jobs:
   containerize:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout
@@ -109,12 +100,3 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-
-  cd:
-    needs: containerize
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    uses: ./.github/workflows/cd.yml
-    secrets: inherit
