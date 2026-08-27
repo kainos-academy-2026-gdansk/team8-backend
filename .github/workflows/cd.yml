@@ -61,11 +61,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.commit_tag }}
-
-      - name: Tag image as latest on main only
-        if: github.ref_name == 'main'
-        run: |
-          docker buildx imagetools create \
-            -t ${{ steps.tags.outputs.image }}:latest \
+          tags: |
             ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.commit_tag }}
+            ${{ steps.tags.outputs.image }}:latest
