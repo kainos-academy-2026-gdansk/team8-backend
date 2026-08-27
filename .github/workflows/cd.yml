@@ -12,10 +12,16 @@ env:
   REGISTRY: ${{ vars.ACR_LOGIN_SERVER }}
   ACR_NAME: ${{ vars.ACR_NAME }}
   IMAGE_NAME: team8-backend
+  CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+  CONTAINER_APP_RESOURCE_GROUP: ${{ vars.CONTAINER_APP_RESOURCE_GROUP }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    outputs:
+      image: ${{ steps.tags.outputs.image }}
+      commit_tag: ${{ steps.tags.outputs.commit_tag }}
 
     steps:
       - name: Checkout
@@ -52,3 +58,25 @@ jobs:
           tags: |
             ${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.commit_tag }}
             ${{ steps.tags.outputs.image }}:latest
+
+  update-container-app:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Update backend Container App image
+        run: |
+          az containerapp update \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$CONTAINER_APP_RESOURCE_GROUP" \
+            --image "${{ needs.build-and-push.outputs.image }}:${{ needs.build-and-push.outputs.commit_tag }}"
