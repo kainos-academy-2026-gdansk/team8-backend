@@ -12,8 +12,8 @@ env:
   REGISTRY: ${{ vars.ACR_LOGIN_SERVER }}
   ACR_NAME: ${{ vars.ACR_NAME }}
   IMAGE_NAME: team8-backend
-  CONTAINER_APP_NAME: team8-frontend-dev-backend
-  CONTAINER_APP_RESOURCE_GROUP: team8-frontend-dev
+  CONTAINER_APP_NAME: ${{ vars.CONTAINER_APP_NAME }}
+  CONTAINER_APP_RESOURCE_GROUP: ${{ vars.CONTAINER_APP_RESOURCE_GROUP }}
 
 jobs:
   build-and-push:
